@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ariella's 17th Birthday Trivia — Hot-Pink Edition</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Fredoka & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --hot-pink: #ff1e8a;
+      --deep-magenta: #c9006b;
+      --baby-pink: #ffb6d9;
+      --blush-bg: #fff0f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top left, #ff7eb9 0%, #ff2a85 45%, #b8005c 100%);
+      min-height: 100vh;
+      color: #2b091c;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Fredoka', system-ui, sans-serif;
+    }
+
+    /* Non-blocking animated background pattern */
+    .bg-sparkles {
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.25) 2px, transparent 2px),
+        radial-gradient(rgba(255, 214, 235, 0.2) 1.5px, transparent 1.5px);
+      background-size: 48px 48px, 32px 32px;
+      background-position: 0 0, 16px 16px;
+    }
+
+    /* Confetti canvas strictly non-blocking */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Glossy White Glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 18px 45px rgba(145, 0, 74, 0.28), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* Glossy 3D Party Buttons */
+    .btn-glossy {
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease, filter 0.14s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .btn-glossy::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 46%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.34), rgba(255,255,255,0.02));
+      pointer-events: none;
+    }
+    .btn-glossy:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.012);
+      filter: brightness(1.04);
+    }
+    .btn-glossy:active:not(:disabled) {
+      transform: translateY(2px) scale(0.985);
+    }
+
+    /* 4 Kahoot Hot-Pink Edition Answer Tile Themes */
+    .tile-0 {
+      background: linear-gradient(135deg, #ff1e8a 0%, #e1006a 100%);
+      box-shadow: 0 7px 0 #9e0049, 0 12px 24px rgba(225, 0, 106, 0.35);
+    }
+    .tile-1 {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      box-shadow: 0 7px 0 #1e3a8a, 0 12px 24px rgba(29, 78, 216, 0.35);
+    }
+    .tile-2 {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 7px 0 #92400e, 0 12px 24px rgba(217, 119, 6, 0.35);
+    }
+    .tile-3 {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 7px 0 #065f46, 0 12px 24px rgba(5, 150, 105, 0.35);
+    }
+
+    /* View Switching */
+    .app-view {
+      display: none;
+    }
+    .app-view.active {
+      display: block;
+      animation: popIn 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    #view-guest-play.app-view.active {
+      display: flex;
+    }
+
+    /* Modal Backdrop: strictly hidden & non-blocking unless .open is present */
+    .modal-backdrop {
+      display: none;
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(74, 4, 42, 0.68);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-backdrop.open {
+      display: flex;
+      pointer-events: auto;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes floatBow {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-5px) rotate(3deg); }
+    }
+    .animate-bow {
+      display: inline-block;
+      animation: floatBow 2.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 30, 138, 0.55); }
+      50% { box-shadow: 0 0 0 14px rgba(255, 30, 138, 0); }
+    }
+    .pulse-pink {
+      animation: pulseGlow 2s infinite;
+    }
+
+    /* Kahoot-Style Sequential Podium Animations */
+    @keyframes podiumRise {
+      0% {
+        transform: translateY(115%) scaleY(0.25);
+        opacity: 0;
+      }
+      72% {
+        transform: translateY(-6%) scaleY(1.04);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(0) scaleY(1);
+        opacity: 1;
+      }
+    }
+    .animate-podium-rise {
+      transform-origin: bottom center;
+      animation: podiumRise 0.85s cubic-bezier(0.22, 1.35, 0.36, 1) forwards;
+    }
+
+    @keyframes avatarBounceDance {
+      0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); }
+      25% { transform: translateY(-14px) rotate(6deg) scale(1.12); }
+      50% { transform: translateY(-4px) rotate(-4deg) scale(1.04); }
+      75% { transform: translateY(-12px) rotate(5deg) scale(1.1); }
+    }
+    .animate-avatar-dance {
+      display: inline-block;
+      animation: avatarBounceDance 1.4s ease-in-out infinite;
+    }
+
+    @keyframes crownDrop {
+      0% { opacity: 0; transform: translateY(-60px) scale(0.4) rotate(-25deg); }
+      70% { opacity: 1; transform: translateY(4px) scale(1.2) rotate(8deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+    .animate-crown-drop {
+      display: inline-block;
+      animation: crownDrop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes spotlightPulse {
+      0%, 100% { box-shadow: 0 0 28px rgba(255, 215, 0, 0.55), 0 0 60px rgba(255, 30, 138, 0.45); }
+      50% { box-shadow: 0 0 44px rgba(255, 215, 0, 0.85), 0 0 85px rgba(255, 30, 138, 0.7); }
+    }
+    .podium-spotlight-1st {
+      animation: spotlightPulse 2s ease-in-out infinite;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #ffe3f1; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: #ff5ca8; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-sparkles flex flex-col justify-between">
+
+  <!-- Non-blocking Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-xs w-full"></div>
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="w-full px-3 sm:px-6 pt-3 pb-2 relative z-20">
+    <div class="max-w-6xl mx-auto glass-card rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <!-- Editable Quiz Title Pill -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="text-2xl sm:text-3xl animate-bow">🎀</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h1 id="header-quiz-title" class="font-display font-bold text-base sm:text-xl md:text-2xl text-pink-600 truncate tracking-tight">
+              Ariella's 17th Birthday Trivia
+            </h1>
+            <button type="button" id="btn-header-edit-title" class="bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs font-bold px-2.5 py-0.5 rounded-full shrink-0 transition cursor-pointer">
+              ✏️ Rename
+            </button>
+          </div>
+          <p id="header-quiz-tagline" class="text-[11px] sm:text-xs font-semibold text-pink-400 truncate">
+            Hot-Pink Edition • Custom Party Trivia
+          </p>
+        </div>
+      </div>
+
+      <!-- Top Action Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+        <button type="button" id="btn-nav-editor" class="bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition cursor-pointer">
+          <span>✏️</span>
+          <span>Edit Quiz</span>
+        </button>
+
+        <button type="button" id="btn-nav-history" class="bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition cursor-pointer">
+          <span>📜</span>
+          <span class="hidden sm:inline">History</span>
+          <span id="history-badge-count" class="bg-pink-500 text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">0</span>
+        </button>
+
+        <button type="button" id="btn-nav-music" class="bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow flex items-center gap-1.5 transition cursor-pointer">
+          <span id="music-icon">🔊</span>
+          <span id="music-label" class="hidden sm:inline">Music</span>
+        </button>
+
+        <button type="button" id="btn-nav-home" class="bg-white hover:bg-pink-50 border border-pink-200 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer">
+          🏠 Home
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="flex-1 w-full max-w-6xl mx-auto px-3 sm:px-6 py-3 flex flex-col justify-center relative z-10">
+
+    <!-- ==================== VIEW 1: START PORTAL (#view-portal) ==================== -->
+    <section id="view-portal" class="app-view active space-y-5 my-auto py-3">
+      <div class="glass-card rounded-3xl p-6 sm:p-10 text-center">
+        <div class="inline-flex items-center gap-2 bg-pink-100 text-pink-700 font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full mb-3">
+          <span>✨ HOT-PINK EDITION • PARTY TRIVIA ✨</span>
+        </div>
+
+        <h2 id="portal-hero-title" class="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-500 mb-3 leading-tight">
+          Ariella's 17th Birthday Trivia 🎀
+        </h2>
+        <p id="portal-hero-subtitle" class="text-pink-900/75 text-sm sm:text-lg max-w-2xl mx-auto mb-7 font-medium">
+          Host a live trivia game on the big screen with your own custom quiz title, or join from your phone with a 4-digit PIN!
+        </p>
+
+        <!-- Dual Primary Action Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto mb-7">
+          <!-- Host a Party Card -->
+          <div id="card-host-party" role="button" tabindex="0"
+            class="btn-glossy bg-gradient-to-br from-pink-500 via-fuchsia-600 to-rose-600 rounded-3xl p-6 sm:p-8 text-white text-left shadow-xl flex flex-col justify-between border-2 border-white/40">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-5xl">👑</span>
+                <span class="bg-white/25 text-white text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">
+                  HOST / TV SCREEN
+                </span>
+              </div>
+              <h3 class="font-display text-3xl sm:text-4xl font-bold mb-2">Host a Party</h3>
+              <p class="text-pink-100 text-sm mb-5 leading-relaxed">
+                Customize your quiz title, pick a deck or paste your own questions, and open a live room with a 4-digit PIN.
+              </p>
+            </div>
+            <div class="w-full bg-white text-pink-600 font-display font-bold text-lg py-3 px-5 rounded-2xl shadow text-center">
+              Set Up & Host →
+            </div>
+          </div>
+
+          <!-- Join a Party Card -->
+          <div id="card-join-party" role="button" tabindex="0"
+            class="btn-glossy bg-white hover:bg-pink-50 border-2 border-pink-300 rounded-3xl p-6 sm:p-8 text-pink-950 text-left shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-5xl">📱</span>
+                <span class="bg-pink-100 text-pink-700 text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">
+                  GUEST CONTROLLER
+                </span>
+              </div>
+              <h3 class="font-display text-3xl sm:text-4xl font-bold text-pink-600 mb-2">Join a Party</h3>
+              <p class="text-pink-900/75 text-sm mb-5 leading-relaxed">
+                Enter the 4-digit PIN from the host screen, choose from 28 fun avatars, and tap the glossy buzzers!
+              </p>
+            </div>
+            <div class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-display font-bold text-lg py-3 px-5 rounded-2xl shadow text-center">
+              Enter Room PIN →
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick-Start Topic Chips + Instant Launch -->
+        <div class="bg-pink-50/90 border border-pink-200 rounded-2xl p-4 max-w-4xl mx-auto">
+          <div class="flex flex-wrap items-center justify-center gap-2 mb-3">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-pink-700 mr-1">Quick Topic Switch:</span>
+            <button type="button" data-preset="ariella" class="preset-chip bg-white hover:bg-pink-100 border border-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+              🎀 Ariella's 17th Birthday
+            </button>
+            <button type="button" data-preset="general" class="preset-chip bg-white hover:bg-pink-100 border border-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+              🌍 General Knowledge
+            </button>
+            <button type="button" data-preset="music" class="preset-chip bg-white hover:bg-pink-100 border border-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+              🎶 Pop Culture & Music
+            </button>
+            <button type="button" data-preset="movies" class="preset-chip bg-white hover:bg-pink-100 border border-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+              🎬 Movies & TV
+            </button>
+            <button type="button" data-preset="blank" class="preset-chip bg-white hover:bg-pink-100 border border-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+              ✨ Blank Custom Quiz
+            </button>
+          </div>
+          <button type="button" id="btn-quick-launch" class="btn-glossy bg-pink-600 hover:bg-pink-700 text-white font-display font-bold text-sm sm:text-base px-6 py-2.5 rounded-xl shadow">
+            ⚡ Quick Launch Lobby (<span id="portal-q-count">15</span> Questions Ready)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: HOST PARTY SETUP (#view-setup) ==================== -->
+    <section id="view-setup" class="app-view space-y-5 my-auto py-3">
+      <div class="glass-card rounded-3xl p-6 sm:p-9 max-w-3xl mx-auto">
+        <div class="flex items-center justify-between pb-4 border-b border-pink-100 mb-5">
+          <button type="button" id="btn-setup-back" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition cursor-pointer">
+            ← Back
+          </button>
+          <span class="bg-pink-100 text-pink-700 font-extrabold text-xs uppercase tracking-wider px-3.5 py-1 rounded-full">
+            👑 Host Party Setup
+          </span>
+        </div>
+
+        <h2 class="font-display text-2xl sm:text-4xl font-bold text-pink-600 mb-1">
+          Customize Your Party Room 🎀
+        </h2>
+        <p class="text-xs sm:text-sm text-gray-600 mb-5">
+          Give your quiz any title you want—it displays on the big screen, on every guest's phone, and on the winners' podium.
+        </p>
+
+        <!-- Editable Quiz Title & Tagline -->
+        <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 sm:p-5 space-y-4 mb-5">
+          <div>
+            <label for="input-setup-title" class="block text-xs font-extrabold uppercase tracking-wider text-pink-700 mb-1.5">
+              ✏️ Quiz Title
+            </label>
+            <input id="input-setup-title" type="text" maxlength="52"
+              placeholder="e.g. Ariella's 17th Birthday Trivia 🎀"
+              class="w-full bg-white border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-3 font-display font-bold text-lg sm:text-xl text-pink-800" />
+          </div>
+          <div>
+            <label for="input-setup-tagline" class="block text-xs font-extrabold uppercase tracking-wider text-pink-700 mb-1.5">
+              ✨ Party Tagline / Subtitle
+            </label>
+            <input id="input-setup-tagline" type="text" maxlength="64"
+              placeholder="e.g. Hot-Pink Edition • Saturday Night Party"
+              class="w-full bg-white border border-pink-300 focus:border-pink-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm font-semibold text-pink-800" />
+          </div>
+        </div>
+
+        <!-- Preset Deck Selector -->
+        <div class="mb-6">
+          <label for="select-setup-preset" class="block text-xs font-extrabold uppercase tracking-wider text-pink-700 mb-1.5">
+            📚 Choose a Starting Question Deck
+          </label>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <select id="select-setup-preset" class="flex-1 bg-white border-2 border-pink-200 rounded-2xl px-4 py-3 text-sm font-bold text-pink-900 focus:outline-none focus:border-pink-500">
+              <option value="current">Keep Current Questions (<span id="opt-current-count">15</span> Qs)</option>
+              <option value="ariella">🎀 Ariella's 17th Birthday (15 Questions)</option>
+              <option value="general">🌍 General Knowledge Mix (12 Questions)</option>
+              <option value="music">🎶 Pop Culture & Music (12 Questions)</option>
+              <option value="movies">🎬 Movies & TV Shows (12 Questions)</option>
+              <option value="blank">✨ Blank Custom Quiz (1 Starter Question)</option>
+            </select>
+            <button type="button" id="btn-setup-open-editor" class="bg-pink-100 hover:bg-pink-200 text-pink-800 font-display font-bold text-sm px-5 py-3 rounded-2xl transition cursor-pointer shrink-0">
+              📝 Edit Questions (<span id="setup-q-badge">15</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Launch Lobby CTA -->
+        <button type="button" id="btn-launch-lobby" class="btn-glossy pulse-pink w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-xl sm:text-2xl py-4 px-6 rounded-2xl shadow-xl">
+          🚀 Open Party Lobby
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: HOST LOBBY (#view-lobby) ==================== -->
+    <section id="view-lobby" class="app-view space-y-5 my-auto py-2">
+      <div class="glass-card rounded-3xl p-5 sm:p-8 text-center">
+        <!-- Top Status Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btn-lobby-edit-quiz" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition cursor-pointer">
+              ✏️ Edit Questions (<span id="lobby-q-count">15</span>)
+            </button>
+            <button type="button" id="btn-lobby-edit-title" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition cursor-pointer">
+              🎀 Edit Title
+            </button>
+          </div>
+
+          <div class="inline-flex items-center gap-2 bg-pink-50 border border-pink-200 px-3.5 py-1.5 rounded-full">
+            <span id="lobby-net-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span id="lobby-net-status" class="text-xs font-bold text-pink-800">Local Party Mode Ready</span>
+          </div>
+        </div>
+
+        <!-- Quiz Title Banner -->
+        <div class="mb-4">
+          <h2 id="lobby-quiz-title" class="font-display text-2xl sm:text-4xl font-bold text-pink-600">
+            Ariella's 17th Birthday Trivia
+          </h2>
+          <p id="lobby-quiz-tagline" class="text-xs sm:text-sm font-semibold text-pink-400">
+            Hot-Pink Edition • Custom Party Trivia
+          </p>
+        </div>
+
+        <!-- Big 4-Digit Room PIN Card -->
+        <div class="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-rose-500 rounded-3xl p-5 sm:p-6 text-white shadow-xl max-w-2xl mx-auto mb-6">
+          <p class="text-xs font-bold uppercase tracking-widest text-pink-100 mb-1">
+            Room PIN for Guest Phones
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+            <span id="lobby-pin-code" class="font-display text-5xl sm:text-7xl font-bold tracking-[0.18em] drop-shadow">
+              0000
+            </span>
+            <button type="button" id="btn-copy-join-link" class="bg-white/25 hover:bg-white/35 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl backdrop-blur transition cursor-pointer">
+              📋 Copy Join Link
+            </button>
+          </div>
+          <p id="lobby-join-url" class="text-[11px] text-pink-100 mt-2 truncate opacity-90"></p>
+        </div>
+
+        <!-- Add Player on This Screen (Single-Screen & Hybrid Support) -->
+        <div class="max-w-2xl mx-auto bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 mb-6 text-left">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-pink-700">
+              ➕ Add Player on This Screen (Play Immediately!)
+            </span>
+            <span id="host-avatar-preview" class="text-xs font-bold text-pink-600 bg-white border border-pink-200 px-2.5 py-0.5 rounded-full">
+              🎀 Coquette Bow
+            </span>
+          </div>
+
+          <!-- 28-Avatar Grid Picker -->
+          <div id="host-avatar-picker" class="grid grid-cols-7 sm:grid-cols-14 gap-1 max-h-24 overflow-y-auto bg-white border border-pink-200 rounded-xl p-1.5 mb-3"></div>
+
+          <div class="flex gap-2">
+            <input id="input-local-player-name" type="text" maxlength="18" placeholder="Enter guest name (e.g. Niaa, Laramae)..."
+              class="flex-1 bg-white border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-xl px-3.5 py-2.5 text-sm font-semibold text-pink-950" />
+            <button type="button" id="btn-add-local-player" class="btn-glossy bg-pink-500 hover:bg-pink-600 text-white font-display font-bold text-sm sm:text-base px-5 py-2.5 rounded-xl shadow shrink-0">
+              + Add Guest
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Players Roster -->
+        <div class="mb-6">
+          <h3 class="font-display text-xl sm:text-2xl font-bold text-pink-700 mb-3">
+            Players in Lobby (<span id="lobby-player-count">0</span>)
+          </h3>
+          <div id="lobby-roster-grid" class="flex flex-wrap justify-center gap-2.5 min-h-[64px] items-center">
+            <p class="text-sm text-pink-400 italic">No guests added yet — add players above or join from a phone!</p>
+          </div>
+        </div>
+
+        <!-- Start Trivia Game Button -->
+        <button type="button" id="btn-start-trivia" class="btn-glossy pulse-pink bg-gradient-to-r from-pink-600 to-rose-600 text-white font-display font-bold text-xl sm:text-2xl px-10 py-4 rounded-2xl shadow-xl">
+          🎉 Start Trivia Game
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: QUESTION & BULK PASTE EDITOR (#view-editor) ==================== -->
+    <section id="view-editor" class="app-view space-y-4 my-auto py-2">
+      <div class="glass-card rounded-3xl p-5 sm:p-7">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-pink-100">
+          <div>
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-pink-600">✏️ Quiz & Question Editor</h2>
+            <p class="text-xs sm:text-sm text-gray-600">Customize your quiz title, switch presets, save custom decks, or bulk-paste questions!</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="btn-open-bulk-paste" class="bg-fuchsia-100 hover:bg-fuchsia-200 text-fuchsia-800 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition cursor-pointer">
+              📋 Bulk Paste
+            </button>
+            <button type="button" id="btn-open-save-deck" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition cursor-pointer">
+              ⭐ Save Custom Deck
+            </button>
+            <button type="button" id="btn-editor-done" class="btn-glossy bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-sm px-5 py-2 rounded-xl shadow">
+              Done & Open Lobby →
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Quiz Title & Tagline Editor -->
+        <div class="mt-4 bg-pink-50 border border-pink-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="input-editor-title" class="block text-[11px] font-extrabold uppercase text-pink-700 mb-1">Quiz Title</label>
+            <input id="input-editor-title" type="text" maxlength="52" class="w-full bg-white border border-pink-300 rounded-xl px-3.5 py-2 text-sm font-bold text-pink-900 focus:outline-none focus:border-pink-500" />
+          </div>
+          <div>
+            <label for="input-editor-tagline" class="block text-[11px] font-extrabold uppercase text-pink-700 mb-1">Party Tagline</label>
+            <input id="input-editor-tagline" type="text" maxlength="64" class="w-full bg-white border border-pink-300 rounded-xl px-3.5 py-2 text-sm font-semibold text-pink-800 focus:outline-none focus:border-pink-500" />
+          </div>
+        </div>
+
+        <!-- Built-In Presets & Saved Decks -->
+        <div class="mt-3 bg-white border border-pink-200 rounded-2xl p-3 space-y-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-xs font-extrabold text-pink-700 uppercase mr-1">Load Preset:</span>
+            <button type="button" data-editor-preset="ariella" class="editor-preset-btn bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer">🎀 Ariella's 17th</button>
+            <button type="button" data-editor-preset="general" class="editor-preset-btn bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer">🌍 General Knowledge</button>
+            <button type="button" data-editor-preset="music" class="editor-preset-btn bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer">🎶 Pop Culture & Music</button>
+            <button type="button" data-editor-preset="movies" class="editor-preset-btn bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer">🎬 Movies & TV</button>
+            <button type="button" data-editor-preset="blank" class="editor-preset-btn bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer">✨ Blank Quiz</button>
+          </div>
+          <div id="saved-decks-container" class="hidden pt-2 border-t border-pink-100 flex flex-wrap items-center gap-1.5">
+            <span class="text-xs font-extrabold text-fuchsia-700 uppercase mr-1">My Saved Decks:</span>
+            <div id="saved-decks-chips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Editable Questions Container -->
+        <div id="editor-questions-container" class="mt-4 space-y-3.5 max-h-[48vh] overflow-y-auto pr-1"></div>
+
+        <div class="mt-4 pt-3 border-t border-pink-100 flex flex-wrap items-center justify-between gap-2">
+          <button type="button" id="btn-add-question" class="btn-glossy bg-pink-500 text-white font-bold text-sm px-5 py-2.5 rounded-2xl shadow">
+            ➕ Add Question
+          </button>
+          <span class="text-xs font-semibold text-pink-600">✅ Changes save automatically</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: LIVE GAMEPLAY (#view-game) ==================== -->
+    <section id="view-game" class="app-view space-y-4 my-auto py-2">
+      <!-- Sub-screen A: Active Question Board -->
+      <div id="game-stage-question" class="space-y-4">
+        <!-- Timer & Progress Header -->
+        <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div id="game-timer-badge" class="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white font-display font-bold text-2xl flex items-center justify-center shadow-lg shrink-0">
+              20
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="game-q-progress" class="text-xs font-extrabold uppercase tracking-wider text-pink-600">Question 1 of 15</span>
+                <span id="game-double-tag" class="hidden bg-amber-400 text-pink-950 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
+                  ✨ 2X POINTS
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 font-medium">Tap an answer on your phone or select below!</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <div id="game-votes-counter" class="font-display text-2xl font-bold text-pink-600">0 / 0</div>
+              <div class="text-[10px] font-extrabold uppercase text-pink-400">Answered</div>
+            </div>
+            <button type="button" id="btn-reveal-now" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl transition cursor-pointer">
+              Reveal Answer ⏭
+            </button>
+          </div>
+        </div>
+
+        <!-- Timer Bar -->
+        <div class="w-full h-2.5 bg-white/40 rounded-full overflow-hidden">
+          <div id="game-timer-bar" class="h-full bg-white transition-all duration-1000 ease-linear" style="width: 100%"></div>
+        </div>
+
+        <!-- Question Text Card -->
+        <div class="glass-card rounded-3xl p-6 sm:p-8 text-center">
+          <h2 id="game-question-text" class="font-display text-2xl sm:text-4xl font-bold text-pink-950 leading-snug">
+            Loading question...
+          </h2>
+        </div>
+
+        <!-- Pass-and-Play Active Player Selector (for multi-player single-screen games) -->
+        <div id="pass-play-bar" class="hidden glass-card rounded-2xl p-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-pink-700">
+              🎮 Single-Screen Buzzer — Select a player, then tap their answer tile:
+            </span>
+            <div id="pass-play-chips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- 4 Glossy Kahoot Answer Tiles -->
+        <div id="game-options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+      </div>
+
+      <!-- Sub-screen B: Answer Reveal & Bar Chart -->
+      <div id="game-stage-reveal" class="hidden glass-card rounded-3xl p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-pink-500">Round Results</span>
+            <h2 id="reveal-q-title" class="font-display text-xl sm:text-2xl font-bold text-pink-950">Question</h2>
+          </div>
+          <button type="button" id="btn-to-leaderboard" class="btn-glossy bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-base sm:text-lg px-6 py-3 rounded-2xl shadow-lg">
+            Round Leaderboard 🏆 →
+          </button>
+        </div>
+
+        <div id="reveal-chart-bars" class="grid grid-cols-4 gap-3 sm:gap-6 items-end h-44 bg-pink-50 rounded-2xl p-4 border border-pink-100"></div>
+        <div id="reveal-answer-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- Sub-screen C: Round Leaderboard -->
+      <div id="game-stage-leaderboard" class="hidden glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-pink-500">Live Scoreboard</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-pink-600">🎀 Standings</h2>
+          </div>
+          <button type="button" id="btn-next-round" class="btn-glossy bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-display font-bold text-lg px-6 py-3 rounded-2xl shadow-lg">
+            Next Question →
+          </button>
+        </div>
+        <div id="round-leaderboard-list" class="space-y-2.5"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 6: ANIMATED KAHOOT-STYLE PODIUM (#view-podium) ==================== -->
+    <section id="view-podium" class="app-view space-y-5 my-auto py-3">
+      <div class="glass-card rounded-3xl p-6 sm:p-10 text-center max-w-4xl mx-auto relative overflow-hidden">
+        <div id="podium-quiz-label" class="inline-block bg-pink-100 text-pink-700 font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full mb-2">
+          🎀 FINAL PODIUM • Ariella's 17th Birthday Trivia
+        </div>
+        <h2 id="podium-headline" class="font-display text-3xl sm:text-5xl font-bold text-pink-600 mb-1">
+          And the Winners Are... 👑
+        </h2>
+        <p id="podium-status-text" class="text-sm sm:text-base font-bold text-pink-500 h-6 mb-4">
+          🥁 Drumroll please...
+        </p>
+
+        <!-- 3-Step Sequential Podium (2nd Left, 1st Center, 3rd Right) -->
+        <div id="podium-pedestals" class="grid grid-cols-3 gap-2 sm:gap-5 items-end max-w-2xl mx-auto mb-7 pt-6 min-h-[260px] sm:min-h-[310px]"></div>
+
+        <!-- Full Standings Table -->
+        <div id="podium-full-table" class="max-w-xl mx-auto space-y-2 mb-7 text-left opacity-0 transition-opacity duration-500"></div>
+
+        <!-- Podium Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-3">
+          <button type="button" id="btn-replay-podium" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-5 py-3 rounded-2xl transition cursor-pointer">
+            🎬 Replay Podium Animation
+          </button>
+          <button type="button" id="btn-podium-confetti" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold px-5 py-3 rounded-2xl transition cursor-pointer">
+            🎉 Confetti Burst
+          </button>
+          <button type="button" id="btn-podium-home" class="btn-glossy bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold px-6 py-3 rounded-2xl shadow-lg">
+            🏠 Back to Home
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 7: JOIN A PARTY (#view-join) ==================== -->
+    <section id="view-join" class="app-view space-y-5 my-auto py-3">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-lg mx-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-pink-100 mb-4">
+          <button type="button" id="btn-join-back" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition cursor-pointer">
+            ← Back
+          </button>
+          <span class="bg-pink-100 text-pink-700 font-extrabold text-xs uppercase tracking-wider px-3.5 py-1 rounded-full">
+            📱 Guest Join
+          </span>
+        </div>
+
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-pink-600 text-center mb-1">
+          Join a Trivia Party 🎀
+        </h2>
+        <p class="text-xs sm:text-sm text-gray-600 text-center mb-5">
+          Enter the 4-digit Room PIN shown on the host's screen and pick your avatar!
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label for="input-join-pin" class="block text-xs font-extrabold uppercase tracking-wider text-pink-700 mb-1">
+              1. 4-Digit Room PIN
+            </label>
+            <input id="input-join-pin" type="text" inputmode="numeric" maxlength="4" placeholder="1234"
+              class="w-full bg-pink-50 border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-3 text-center font-display text-3xl font-bold tracking-[0.25em] text-pink-700" />
+          </div>
+
+          <div>
+            <label for="input-join-name" class="block text-xs font-extrabold uppercase tracking-wider text-pink-700 mb-1">
+              2. Your Nickname
+            </label>
+            <input id="input-join-name" type="text" maxlength="18" placeholder="e.g. Sophia 💅"
+              class="w-full bg-pink-50 border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-3 font-semibold text-base text-pink-950" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-pink-700">3. Choose Your Avatar</span>
+              <span id="join-avatar-label" class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-0.5 rounded-full">🎀 Coquette Bow</span>
+            </div>
+            <div id="join-avatar-picker" class="grid grid-cols-7 gap-1.5 max-h-40 overflow-y-auto bg-pink-50 border border-pink-200 rounded-2xl p-2"></div>
+          </div>
+
+          <button type="button" id="btn-submit-join" class="btn-glossy w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-lg sm:text-xl py-3.5 px-6 rounded-2xl shadow-lg">
+            ✨ Enter Party Room
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 8: GUEST PHONE BUZZER (#view-guest-play) ==================== -->
+    <section id="view-guest-play" class="app-view flex-1 flex-col justify-between my-auto py-2">
+      <!-- Guest HUD -->
+      <div class="glass-card rounded-2xl px-4 py-3 flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="guest-hud-avatar" class="text-2xl shrink-0">🎀</span>
+          <div class="min-w-0">
+            <div id="guest-hud-name" class="font-display font-bold text-pink-700 text-base leading-none truncate">Guest</div>
+            <div class="text-[11px] font-semibold text-pink-400 truncate">
+              PIN: <span id="guest-hud-pin">----</span> • <span id="guest-hud-quiz-title">Party Trivia</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div id="guest-hud-score" class="font-display font-bold text-xl text-pink-600 leading-none">0 pts</div>
+          <div id="guest-hud-streak" class="text-[11px] font-bold text-orange-500"></div>
+        </div>
+      </div>
+
+      <!-- Guest Waiting Screen -->
+      <div id="guest-state-waiting" class="glass-card rounded-3xl p-8 text-center my-auto">
+        <div class="text-6xl mb-3 animate-bounce">🎀</div>
+        <div class="inline-block bg-pink-100 text-pink-700 font-bold text-xs px-4 py-1.5 rounded-full mb-3">
+          Joined: <span id="guest-waiting-quiz-title">Party Trivia</span>
+        </div>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-pink-600 mb-2">You're In!</h2>
+        <p class="text-gray-600 text-sm">Look at the host screen for your name—the game starts soon!</p>
+      </div>
+
+      <!-- Guest Active 4-Shape Buzzer Buttons -->
+      <div id="guest-state-buzzers" class="hidden flex-1 flex flex-col gap-3">
+        <div class="glass-card rounded-2xl px-4 py-2.5 text-center">
+          <p id="guest-question-prompt" class="font-display font-bold text-sm sm:text-base text-pink-900">Tap your answer!</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 flex-1 min-h-[290px]">
+          <button type="button" data-buzzer="0" class="guest-buzzer-btn btn-glossy tile-0 rounded-3xl text-white flex flex-col items-center justify-center p-4 shadow-xl">
+            <span class="text-5xl mb-2">▲</span>
+            <span id="guest-opt-0" class="font-bold text-xs sm:text-sm text-center">Option A</span>
+          </button>
+          <button type="button" data-buzzer="1" class="guest-buzzer-btn btn-glossy tile-1 rounded-3xl text-white flex flex-col items-center justify-center p-4 shadow-xl">
+            <span class="text-5xl mb-2">◆</span>
+            <span id="guest-opt-1" class="font-bold text-xs sm:text-sm text-center">Option B</span>
+          </button>
+          <button type="button" data-buzzer="2" class="guest-buzzer-btn btn-glossy tile-2 rounded-3xl text-white flex flex-col items-center justify-center p-4 shadow-xl">
+            <span class="text-5xl mb-2">●</span>
+            <span id="guest-opt-2" class="font-bold text-xs sm:text-sm text-center">Option C</span>
+          </button>
+          <button type="button" data-buzzer="3" class="guest-buzzer-btn btn-glossy tile-3 rounded-3xl text-white flex flex-col items-center justify-center p-4 shadow-xl">
+            <span class="text-5xl mb-2">■</span>
+            <span id="guest-opt-3" class="font-bold text-xs sm:text-sm text-center">Option D</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Guest Locked / Feedback Screen -->
+      <div id="guest-state-status" class="hidden glass-card rounded-3xl p-8 text-center my-auto">
+        <div id="guest-status-icon" class="text-6xl mb-3">🔒</div>
+        <h2 id="guest-status-title" class="font-display text-3xl font-bold text-pink-600 mb-2">Locked In!</h2>
+        <div id="guest-status-pill" class="inline-block bg-pink-100 text-pink-700 font-display font-bold text-lg px-5 py-1.5 rounded-full mb-2">
+          Waiting for results...
+        </div>
+        <p id="guest-status-sub" class="text-sm text-gray-600">Eyes on the big screen!</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL 1: EDIT QUIZ TITLE ==================== -->
+  <div id="modal-title" class="modal-backdrop">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-2xl font-bold text-pink-600">🎀 Edit Quiz Title</h3>
+        <button type="button" data-close-modal="modal-title" class="text-gray-400 hover:text-pink-600 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <div>
+        <label for="modal-input-title" class="block text-xs font-extrabold uppercase text-pink-700 mb-1">Quiz Title</label>
+        <input id="modal-input-title" type="text" maxlength="52"
+          class="w-full bg-pink-50 border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-2.5 font-display font-bold text-lg text-pink-800" />
+      </div>
+      <div>
+        <label for="modal-input-tagline" class="block text-xs font-extrabold uppercase text-pink-700 mb-1">Tagline / Subtitle</label>
+        <input id="modal-input-tagline" type="text" maxlength="64"
+          class="w-full bg-pink-50 border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-2 text-sm font-semibold text-pink-800" />
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" data-close-modal="modal-title" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+        <button type="button" id="btn-save-modal-title" class="btn-glossy bg-pink-500 text-white font-bold text-sm px-5 py-2 rounded-xl">Save Title</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: BULK PASTE QUESTIONS ==================== -->
+  <div id="modal-bulk" class="modal-backdrop">
+    <div class="glass-card rounded-3xl max-w-2xl w-full p-6 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-2xl font-bold text-pink-600">📋 Bulk Paste Questions</h3>
+        <button type="button" data-close-modal="modal-bulk" class="text-gray-400 hover:text-pink-600 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <p class="text-xs sm:text-sm text-gray-600">
+        One question per line separated by <code class="bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded font-bold">|</code>, with <code class="bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded font-bold">*</code> on the correct answer:
+      </p>
+      <div class="bg-pink-50 border border-pink-200 rounded-xl p-2.5 text-[11px] text-pink-800 font-mono">
+        What is my go-to coffee order? | Iced Matcha Latte* | Pink Drink | Caramel Macchiato | Chai Latte<br/>
+        [2X] What is my dream vacation spot? | Tokyo* | Paris | Amalfi Coast | Bora Bora
+      </div>
+      <textarea id="textarea-bulk-paste" rows="6" placeholder="Paste your questions here..."
+        class="w-full bg-white border-2 border-pink-200 focus:border-pink-500 focus:outline-none rounded-2xl p-3 text-sm text-gray-800"></textarea>
+      <div class="flex flex-wrap justify-end gap-2">
+        <button type="button" data-close-modal="modal-bulk" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+        <button type="button" id="btn-bulk-append" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-sm px-4 py-2 rounded-xl cursor-pointer">+ Append to Quiz</button>
+        <button type="button" id="btn-bulk-replace" class="btn-glossy bg-pink-600 text-white font-bold text-sm px-5 py-2 rounded-xl">Replace Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: SAVE CUSTOM DECK ==================== -->
+  <div id="modal-save-deck" class="modal-backdrop">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-2xl font-bold text-pink-600">⭐ Save Custom Deck</h3>
+        <button type="button" data-close-modal="modal-save-deck" class="text-gray-400 hover:text-pink-600 text-2xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <p class="text-xs text-gray-600">Save your current title and questions to your browser so you can load them anytime.</p>
+      <input id="input-custom-deck-name" type="text" maxlength="40" placeholder="e.g. Saturday Party Quiz"
+        class="w-full bg-pink-50 border-2 border-pink-300 focus:border-pink-500 focus:outline-none rounded-2xl px-4 py-3 font-display font-bold text-base text-pink-800" />
+      <div class="flex justify-end gap-2">
+        <button type="button" data-close-modal="modal-save-deck" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+        <button type="button" id="btn-confirm-save-deck" class="btn-glossy bg-pink-500 text-white font-bold text-sm px-5 py-2 rounded-xl">Save Deck</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 4: GAME HISTORY & HALL OF FAME ==================== -->
+  <div id="modal-history" class="modal-backdrop">
+    <div class="glass-card rounded-3xl max-w-3xl w-full p-5 sm:p-7 max-h-[86vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-pink-100">
+        <div>
+          <h3 class="font-display text-2xl sm:text-3xl font-bold text-pink-600">📜 Game History & Hall of Fame</h3>
+          <p class="text-xs text-gray-600">Every hosted party game is logged automatically below.</p>
+        </div>
+        <button type="button" data-close-modal="modal-history" class="w-9 h-9 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-700 text-xl font-bold flex items-center justify-center cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Summary Counters -->
+      <div class="grid grid-cols-3 gap-3 my-4">
+        <div class="bg-gradient-to-br from-pink-500 to-rose-500 text-white rounded-2xl p-3 text-center shadow">
+          <div id="stat-total-games" class="font-display text-2xl sm:text-3xl font-bold">0</div>
+          <div class="text-[10px] sm:text-xs font-bold uppercase text-pink-100">Games Hosted</div>
+        </div>
+        <div class="bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white rounded-2xl p-3 text-center shadow">
+          <div id="stat-top-score" class="font-display text-2xl sm:text-3xl font-bold">0</div>
+          <div class="text-[10px] sm:text-xs font-bold uppercase text-pink-100">Top Score</div>
+        </div>
+        <div class="bg-gradient-to-br from-rose-400 to-pink-600 text-white rounded-2xl p-3 text-center shadow">
+          <div id="stat-total-players" class="font-display text-2xl sm:text-3xl font-bold">0</div>
+          <div class="text-[10px] sm:text-xs font-bold uppercase text-pink-100">Total Players</div>
+        </div>
+      </div>
+
+      <!-- History List -->
+      <div id="history-list-container" class="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[140px]"></div>
+
+      <div class="pt-4 mt-3 border-t border-pink-100 flex items-center justify-between">
+        <button type="button" id="btn-clear-history" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-xs px-3.5 py-2 rounded-xl transition cursor-pointer">
+          🗑 Clear History
+        </button>
+        <button type="button" data-close-modal="modal-history" class="btn-glossy bg-pink-500 text-white font-display font-bold text-sm px-5 py-2 rounded-xl">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-2 text-[11px] font-semibold text-white/85 relative z-10">
+    Hot-Pink Edition 🎀 • Works Offline & Multi-Device
+  </footer>
+
+  <!-- ==================== CLEAN, ISOLATED APPLICATION SCRIPT ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. SAFE STORAGE & UTILITIES (NEVER THROWS IN SANDBOXED IFRAMES)
+      ---------------------------------------------------------------------- */
+      const memStore = {};
+      function storeGet(key) {
+        try {
+          return window.localStorage.getItem(key);
+        } catch (err) {
+          return Object.prototype.hasOwnProperty.call(memStore, key) ? memStore[key] : null;
+        }
+      }
+      function storeSet(key, value) {
+        try {
+          window.localStorage.setItem(key, value);
+        } catch (err) {
+          memStore[key] = value;
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function copyTextSafe(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        } catch (err) {}
+      }
+
+      /* ----------------------------------------------------------------------
+         2. BUILT-IN AVATARS, SHAPES & QUIZ PRESETS
+      ---------------------------------------------------------------------- */
+      const AVATARS = [
+        { emoji: '🎀', label: 'Coquette Bow' },
+        { emoji: '👑', label: 'Birthday Crown' },
+        { emoji: '🪩', label: 'Disco Ball' },
+        { emoji: '💅', label: 'Glam Nails' },
+        { emoji: '💖', label: 'Sparkle Heart' },
+        { emoji: '🦋', label: 'Butterfly' },
+        { emoji: '🍒', label: 'Sweet Cherries' },
+        { emoji: '🍓', label: 'Strawberry' },
+        { emoji: '🧁', label: 'Cupcake' },
+        { emoji: '🥂', label: 'Party Toast' },
+        { emoji: '🌸', label: 'Cherry Blossom' },
+        { emoji: '🦄', label: 'Unicorn' },
+        { emoji: '🦩', label: 'Flamingo' },
+        { emoji: '🧸', label: 'Teddy Bear' },
+        { emoji: '💄', label: 'Lipstick' },
+        { emoji: '👛', label: 'Pink Handbag' },
+        { emoji: '👠', label: 'High Heel' },
+        { emoji: '🎧', label: 'Headphones' },
+        { emoji: '🎤', label: 'Pop Star Mic' },
+        { emoji: '📸', label: 'Flash Camera' },
+        { emoji: '✨', label: 'Sparkles' },
+        { emoji: '🌷', label: 'Pink Tulip' },
+        { emoji: '🍑', label: 'Peach' },
+        { emoji: '🧋', label: 'Boba Tea' },
+        { emoji: '🍰', label: 'Birthday Cake' },
+        { emoji: '🐈', label: 'Kitty' },
+        { emoji: '🐩', label: 'Poodle' },
+        { emoji: '🌟', label: 'Superstar' }
+      ];
+
+      const SHAPES = [
+        { symbol: '▲', tileClass: 'tile-0', barColor: '#ff1e8a' },
+        { symbol: '◆', tileClass: 'tile-1', barColor: '#3b82f6' },
+        { symbol: '●', tileClass: 'tile-2', barColor: '#f59e0b' },
+        { symbol: '■', tileClass: 'tile-3', barColor: '#10b981' }
+      ];
+
+      const PRESETS = {
+        ariella: {
+          title: "Ariella's 17th Birthday Trivia",
+          tagline: "Hot-Pink Edition • How Well Do You Know Ariella?",
+          questions: [
+            { question: "What time of day was Ariella born?", options: ["Early morning", "Right around noon", "Late at night", "At midnight"], correctIndex: 2, timeLimit: 20, doublePoints: false },
+            { question: "What was Ariella's childhood dream job?", options: ["Pop star", "Veterinarian", "Fashion designer", "Doctor"], correctIndex: 2, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's go-to coffee or café drink?", options: ["Iced Matcha Latte", "Pink Drink", "Iced Caramel Macchiato", "Strawberry Açaí Refresher"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which beauty item can Ariella not leave the house without?", options: ["Lip gloss / lip oil", "Blush", "Mascara", "Perfume roller"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "If Ariella could only listen to one artist forever, who is it?", options: ["Sabrina Carpenter", "Billie Eilish", "SZA", "Taylor Swift"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's biggest pet peeve?", options: ["Slow walkers", "Loud chewing", "Late text replies", "Movie spoilers"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella most likely doing at 1:00 AM on a weekend?", options: ["Scrolling TikTok", "Online window shopping", "FaceTiming friends", "Fast asleep"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's dream splurge item?", options: ["Dyson Airwrap", "Designer handbag", "Concert VIP tickets", "A beach vacation"], correctIndex: 2, timeLimit: 20, doublePoints: false },
+            { question: "Which color dominates Ariella's aesthetic?", options: ["Hot pink & pastel pink", "All black everything", "Sage green", "Baby blue"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's go-to comfort food?", options: ["Sushi", "Pasta", "Tacos", "Ice cream"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's biggest irrational fear?", options: ["Spiders & bugs", "Heights", "The dark", "Public speaking"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "How does Ariella usually plan a hangout?", options: ["Detailed itinerary & outfits", "Last-minute spontaneous", "Goes with the flow", "Lets the group chat decide"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is Ariella's signature emoji?", options: ["🎀", "😭", "💀", "✨"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "If Ariella won $1,000,000 tomorrow, what's her first move?", options: ["Take all her friends on a trip", "Wardrobe overhaul", "Save & invest most of it", "Buy a dream car"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "FINAL QUESTION: What makes Ariella the best friend ever?", options: ["Always hypes everyone up", "Gives the best advice", "Always down for an adventure", "All of the above 💖"], correctIndex: 3, timeLimit: 20, doublePoints: true }
+          ]
+        },
+        general: {
+          title: "General Knowledge Party Trivia",
+          tagline: "Hot-Pink Edition • Fast-Paced Trivia Mix",
+          questions: [
+            { question: "Which planet in our solar system is known as the Red Planet?", options: ["Mars", "Venus", "Jupiter", "Saturn"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is the capital city of Japan?", options: ["Tokyo", "Kyoto", "Osaka", "Seoul"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "How many continents are there on Earth?", options: ["7", "6", "5", "8"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which ocean is the largest on Earth?", options: ["Pacific Ocean", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What chemical element has the symbol 'Au'?", options: ["Gold", "Silver", "Aluminum", "Argon"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Who painted the Mona Lisa?", options: ["Leonardo da Vinci", "Pablo Picasso", "Vincent van Gogh", "Claude Monet"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is the fastest land animal?", options: ["Cheetah", "Pronghorn Antelope", "Lion", "Greyhound"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which country invented pizza?", options: ["Italy", "Greece", "France", "United States"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "How many bones are in the adult human body?", options: ["206", "195", "215", "180"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is the tallest mountain in the world above sea level?", options: ["Mount Everest", "K2", "Kilimanjaro", "Denali"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "Which language has the most native speakers worldwide?", options: ["Mandarin Chinese", "English", "Spanish", "Hindi"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "In what year did humans first land on the Moon?", options: ["1969", "1965", "1972", "1959"], correctIndex: 0, timeLimit: 20, doublePoints: true }
+          ]
+        },
+        music: {
+          title: "Pop Culture & Music Showdown",
+          tagline: "Hot-Pink Edition • Hits, Icons & Viral Moments",
+          questions: [
+            { question: "Which pop star released the hit song 'Espresso'?", options: ["Sabrina Carpenter", "Olivia Rodrigo", "Dua Lipa", "Chappell Roan"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is the name of Beyoncé's fanbase?", options: ["The BeyHive", "Swifties", "Arianators", "Little Monsters"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which album features the hit single 'Good Luck, Babe!'?", options: ["Chappell Roan single", "GUTS", "Short n' Sweet", "HIT ME HARD AND SOFT"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Who headlined the 2024 Super Bowl Halftime Show?", options: ["Usher", "Rihanna", "The Weeknd", "Shakira"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which artist broke records with 'The Eras Tour'?", options: ["Taylor Swift", "Ariana Grande", "Billie Eilish", "Harry Styles"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What color is associated with Charli XCX's 2024 album 'Brat'?", options: ["Lime green", "Hot pink", "Neon orange", "Electric blue"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which group sang 'Dancing Queen'?", options: ["ABBA", "Fleetwood Mac", "Spice Girls", "Blondie"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "Who sang 'Birds of a Feather'?", options: ["Billie Eilish", "SZA", "Lana Del Rey", "Gracie Abrams"], correctIndex: 0, timeLimit: 20, doublePoints: true }
+          ]
+        },
+        movies: {
+          title: "Movies & TV Trivia Night",
+          tagline: "Hot-Pink Edition • Blockbusters & Iconic Shows",
+          questions: [
+            { question: "Who directed the 2023 'Barbie' movie?", options: ["Greta Gerwig", "Sofia Coppola", "Olivia Wilde", "Patty Jenkins"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "In 'Mean Girls', what day of the week do they wear pink?", options: ["Wednesday", "Friday", "Monday", "Thursday"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "What is the name of the coffee shop in 'Friends'?", options: ["Central Perk", "Luke's Diner", "Monk's Café", "The Peach Pit"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which animated movie features the song 'Let It Go'?", options: ["Frozen", "Tangled", "Moana", "Encanto"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "In 'Harry Potter', what house is Luna Lovegood in?", options: ["Ravenclaw", "Gryffindor", "Hufflepuff", "Slytherin"], correctIndex: 0, timeLimit: 20, doublePoints: false },
+            { question: "Which Netflix show takes place in Hawkins, Indiana?", options: ["Stranger Things", "Wednesday", "Outer Banks", "Riverdale"], correctIndex: 0, timeLimit: 20, doublePoints: true },
+            { question: "What is the highest-grossing movie of all time (unadjusted)?", options: ["Avatar", "Avengers: Endgame", "Titanic", "Barbie"], correctIndex: 0, timeLimit: 20, doublePoints: true }
+          ]
+        },
+        blank: {
+          title: "Custom Party Trivia",
+          tagline: "Hot-Pink Edition • Custom Questions",
+          questions: [
+            { question: "Type your first custom question here!", options: ["Correct Answer", "Option B", "Option C", "Option D"], correctIndex: 0, timeLimit: 20, doublePoints: false }
+          ]
+        }
+      };
+
+      /* ----------------------------------------------------------------------
+         3. APPLICATION STATE
+      ---------------------------------------------------------------------- */
+      const STORAGE_KEYS = {
+        TITLE: 'hp_trivia_title_v2',
+        TAGLINE: 'hp_trivia_tagline_v2',
+        QUESTIONS: 'hp_trivia_questions_v2',
+        DECKS: 'hp_trivia_decks_v2',
+        HISTORY: 'hp_trivia_history_v2'
+      };
+
+      let quizTitle = storeGet(STORAGE_KEYS.TITLE) || PRESETS.ariella.title;
+      let quizTagline = storeGet(STORAGE_KEYS.TAGLINE) || PRESETS.ariella.tagline;
+      let questions = loadQuestionsFromStore();
+      let savedDecks = loadJsonStore(STORAGE_KEYS.DECKS, []);
+      let gameHistory = loadJsonStore(STORAGE_KEYS.HISTORY, []);
+
+      let roomPin = '';
+      let currentHistoryId = null;
+      let players = []; // [{ id, name, avatar, score, prevRank, streak, answerIdx, answerTimeMs, lastDelta, isRemote }]
+      let activePassPlayPlayerId = null;
+      let selectedHostAvatar = '🎀';
+      let selectedJoinAvatar = '🎀';
+
+      let currentQuestionIdx = 0;
+      let questionTimer = null;
+      let questionStartMs = 0;
+      let secondsLeft = 20;
+      let isRevealed = false;
+      let podiumTimers = [];
+
+      // Optional non-blocking PeerJS state
+      let peerInstance = null;
+      let peerConnections = {};
+      let guestConnection = null;
+      let guestProfile = { id: '', name: '', avatar: '🎀', score: 0, streak: 0, locked: false };
+
+      function loadQuestionsFromStore() {
+        const parsed = loadJsonStore(STORAGE_KEYS.QUESTIONS, null);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        return JSON.parse(JSON.stringify(PRESETS.ariella.questions));
+      }
+
+      function loadJsonStore(key, fallback) {
+        try {
+          const raw = storeGet(key);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          return parsed != null ? parsed : fallback;
+        } catch (err) {
+          return fallback;
+        }
+      }
+
+      function persistState() {
+        storeSet(STORAGE_KEYS.TITLE, quizTitle);
+        storeSet(STORAGE_KEYS.TAGLINE, quizTagline);
+        storeSet(STORAGE_KEYS.QUESTIONS, JSON.stringify(questions));
+        storeSet(STORAGE_KEYS.DECKS, JSON.stringify(savedDecks));
+        storeSet(STORAGE_KEYS.HISTORY, JSON.stringify(gameHistory));
+      }
+
+      /* ----------------------------------------------------------------------
+         4. NON-BLOCKING SOUND EFFECTS & CONFETTI CANVAS
+      ---------------------------------------------------------------------- */
+      let audioCtx = null;
+      let musicMuted = false;
+
+      function ensureAudio() {
+        try {
+          if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) audioCtx = new Ctx();
+          }
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+          }
+        } catch (err) {}
+      }
+
+      function playBeep(freq, dur = 0.14, type = 'triangle', gainVal = 0.14, delay = 0) {
+        if (musicMuted) return;
+        ensureAudio();
+        if (!audioCtx) return;
+        try {
+          const t = audioCtx.currentTime + delay;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(gainVal, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + dur);
+        } catch (err) {}
+      }
+
+      function sfx(name) {
+        if (musicMuted) return;
+        if (name === 'pop') {
+          playBeep(587.33, 0.11, 'sine', 0.14, 0);
+          playBeep(880, 0.15, 'sine', 0.13, 0.06);
+        } else if (name === 'tick') {
+          playBeep(740, 0.05, 'triangle', 0.06, 0);
+        } else if (name === 'urgent') {
+          playBeep(987.77, 0.08, 'sawtooth', 0.08, 0);
+        } else if (name === 'correct') {
+          playBeep(523.25, 0.13, 'triangle', 0.16, 0);
+          playBeep(659.25, 0.13, 'triangle', 0.16, 0.1);
+          playBeep(783.99, 0.13, 'triangle', 0.16, 0.2);
+          playBeep(1046.5, 0.32, 'triangle', 0.18, 0.3);
+        } else if (name === 'drumroll') {
+          for (let i = 0; i < 12; i++) {
+            playBeep(135 + i * 14, 0.06, 'triangle', 0.1 + i * 0.005, i * 0.075);
+          }
+        } else if (name === 'podiumStep') {
+          playBeep(440, 0.13, 'triangle', 0.16, 0);
+          playBeep(554.37, 0.13, 'triangle', 0.16, 0.09);
+          playBeep(659.25, 0.25, 'triangle', 0.18, 0.18);
+        } else if (name === 'fanfare') {
+          [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, idx) => {
+            playBeep(f, idx === 5 ? 0.45 : 0.14, 'triangle', 0.18, idx * 0.12);
+          });
+        }
+      }
+
+      // Built-in lightweight canvas confetti (zero external CDN dependency)
+      let confettiParticles = [];
+      let confettiAnimId = null;
+
+      function launchConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ['#ff1e8a', '#ff85c0', '#ffffff', '#ffd166', '#3b82f6', '#10b981'];
+        for (let i = 0; i < 95; i++) {
+          confettiParticles.push({
+            x: canvas.width * (0.25 + Math.random() * 0.5),
+            y: canvas.height * 0.55,
+            vx: (Math.random() - 0.5) * 14,
+            vy: -Math.random() * 14 - 4,
+            size: 6 + Math.random() * 7,
+            color: colors[i % colors.length],
+            rot: Math.random() * 360,
+            vrot: (Math.random() - 0.5) * 12,
+            life: 110 + Math.random() * 40
+          });
+        }
+
+        if (!confettiAnimId) {
+          const step = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiParticles = confettiParticles.filter(p => p.life > 0);
+            confettiParticles.forEach(p => {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.vy += 0.38;
+              p.rot += p.vrot;
+              p.life -= 1;
+              ctx.save();
+              ctx.translate(p.x, p.y);
+              ctx.rotate((p.rot * Math.PI) / 180);
+              ctx.fillStyle = p.color;
+              ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+              ctx.restore();
+            });
+            if (confettiParticles.length > 0) {
+              confettiAnimId = requestAnimationFrame(step);
+            } else {
+              confettiAnimId = null;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+          };
+          confettiAnimId = requestAnimationFrame(step);
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         5. VIEW NAVIGATION, MODALS & TOASTS
+      ---------------------------------------------------------------------- */
+      function showView(viewId) {
+        document.querySelectorAll('.app-view').forEach(sec => {
+          sec.classList.toggle('active', sec.id === viewId);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function openModal(modalId) {
+        const el = document.getElementById(modalId);
+        if (el) el.classList.add('open');
+      }
+
+      function closeModal(modalId) {
+        const el = document.getElementById(modalId);
+        if (el) el.classList.remove('open');
+      }
+
+      function showToast(msg, isError = false) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const div = document.createElement('div');
+        div.className = `${isError ? 'bg-rose-600 text-white' : 'bg-white text-pink-800 border-2 border-pink-300'} px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-bold pointer-events-auto`;
+        div.textContent = msg;
+        container.appendChild(div);
+        setTimeout(() => {
+          div.style.opacity = '0';
+          div.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => div.remove(), 260);
+        }, 3000);
+      }
+
+      function syncTitleDisplays() {
+        const setText = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        };
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el && document.activeElement !== el) el.value = val;
+        };
+
+        setText('header-quiz-title', quizTitle);
+        setText('header-quiz-tagline', quizTagline);
+        setText('portal-hero-title', `${quizTitle} 🎀`);
+        setText('lobby-quiz-title', quizTitle);
+        setText('lobby-quiz-tagline', quizTagline);
+        setText('podium-quiz-label', `🎀 FINAL PODIUM • ${quizTitle}`);
+
+        setVal('input-setup-title', quizTitle);
+        setVal('input-setup-tagline', quizTagline);
+        setVal('input-editor-title', quizTitle);
+        setVal('input-editor-tagline', quizTagline);
+
+        setText('portal-q-count', questions.length);
+        setText('setup-q-badge', questions.length);
+        setText('lobby-q-count', questions.length);
+        setText('history-badge-count', gameHistory.length);
+
+        document.title = `${quizTitle} — Hot-Pink Edition`;
+
+        // Sync live title to any connected remote guest phones
+        broadcastToPeers({ type: 'SYNC_TITLE', title: quizTitle });
+      }
+
+      function applyPreset(presetKey, silent = false) {
+        const preset = PRESETS[presetKey];
+        if (!preset) return;
+        quizTitle = preset.title;
+        quizTagline = preset.tagline;
+        questions = JSON.parse(JSON.stringify(preset.questions));
+        persistState();
+        syncTitleDisplays();
+        renderEditorQuestions();
+        sfx('pop');
+        if (!silent) {
+          showToast(`🎀 Loaded "${preset.title}" (${questions.length} Qs)`);
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         6. HOST SETUP & LOBBY (100% SYNCHRONOUS, ZERO NETWORK BLOCKING)
+      ---------------------------------------------------------------------- */
+      function openHostSetup() {
+        sfx('pop');
+        syncTitleDisplays();
+        showView('view-setup');
+      }
+
+      function launchLobby() {
+        sfx('pop');
+        clearInterval(questionTimer);
+        podiumTimers.forEach(t => clearTimeout(t));
+        podiumTimers = [];
+
+        // Read latest setup fields if user edited them
+        const setupTitleInput = document.getElementById('input-setup-title');
+        const setupTaglineInput = document.getElementById('input-setup-tagline');
+        if (setupTitleInput && setupTitleInput.value.trim()) {
+          quizTitle = setupTitleInput.value.trim();
+        }
+        if (setupTaglineInput && setupTaglineInput.value.trim()) {
+          quizTagline = setupTaglineInput.value.trim();
+        }
+        persistState();
+
+        if (!roomPin) {
+          roomPin = String(Math.floor(1000 + Math.random() * 9000));
+        }
+
+        document.getElementById('lobby-pin-code').textContent = roomPin;
+        const baseUrl = window.location.href.split('?')[0];
+        document.getElementById('lobby-join-url').textContent = `${baseUrl}?pin=${roomPin}`;
+
+        syncTitleDisplays();
+        renderAvatarGrids();
+        renderLobbyRoster();
+        recordHistorySession('Lobby Open / Started');
+        showView('view-lobby');
+
+        // Background non-blocking PeerJS upgrade (never blocks lobby!)
+        initBackgroundPeerHost(roomPin);
+      }
+
+      function renderAvatarGrids() {
+        const buildGrid = (containerId, selectedEmoji, onPick) => {
+          const el = document.getElementById(containerId);
+          if (!el) return;
+          el.innerHTML = AVATARS.map(item => {
+            const isSel = item.emoji === selectedEmoji;
+            return `<button type="button" data-emoji="${item.emoji}" class="avatar-opt-btn text-xl aspect-square rounded-xl flex items-center justify-center transition ${
+              isSel ? 'bg-pink-500 text-white ring-2 ring-pink-500 scale-105 shadow' : 'bg-pink-50/70 hover:bg-pink-100'
+            }" title="${item.label}">${item.emoji}</button>`;
+          }).join('');
+          el.querySelectorAll('.avatar-opt-btn').forEach(btn => {
+            btn.addEventListener('click', () => onPick(btn.getAttribute('data-emoji')));
+          });
+        };
+
+        buildGrid('host-avatar-picker', selectedHostAvatar, (emoji) => {
+          selectedHostAvatar = emoji;
+          const found = AVATARS.find(a => a.emoji === emoji);
+          const lbl = document.getElementById('host-avatar-preview');
+          if (lbl && found) lbl.textContent = `${found.emoji} ${found.label}`;
+          sfx('pop');
+          renderAvatarGrids();
+        });
+
+        buildGrid('join-avatar-picker', selectedJoinAvatar, (emoji) => {
+          selectedJoinAvatar = emoji;
+          const found = AVATARS.find(a => a.emoji === emoji);
+          const lbl = document.getElementById('join-avatar-label');
+          if (lbl && found) lbl.textContent = `${found.emoji} ${found.label}`;
+          sfx('pop');
+          renderAvatarGrids();
+        });
+      }
+
+      function addLocalGuest() {
+        const input = document.getElementById('input-local-player-name');
+        if (!input) return;
+        const name = input.value.trim();
+        if (!name) {
+          showToast('Type a guest name first!', true);
+          input.focus();
+          return;
+        }
+
+        const newPlayer = {
+          id: 'local_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+          name: name.slice(0, 18),
+          avatar: selectedHostAvatar,
+          score: 0,
+          prevRank: 0,
+          streak: 0,
+          answerIdx: null,
+          answerTimeMs: 0,
+          lastDelta: 0,
+          isRemote: false
+        };
+        players.push(newPlayer);
+        input.value = '';
+
+        // Cycle to next avatar automatically for convenience
+        const curIdx = AVATARS.findIndex(a => a.emoji === selectedHostAvatar);
+        const nextAvatar = AVATARS[(curIdx + 1) % AVATARS.length];
+        selectedHostAvatar = nextAvatar.emoji;
+        const lbl = document.getElementById('host-avatar-preview');
+        if (lbl) lbl.textContent = `${nextAvatar.emoji} ${nextAvatar.label}`;
+
+        sfx('pop');
+        renderAvatarGrids();
+        renderLobbyRoster();
+        recordHistorySession('Lobby Open / Started');
+      }
+
+      function removePlayerById(id) {
+        players = players.filter(p => p.id !== id);
+        if (peerConnections[id]) {
+          try { peerConnections[id].close(); } catch (err) {}
+          delete peerConnections[id];
+        }
+        renderLobbyRoster();
+      }
+
+      function renderLobbyRoster() {
+        const countEl = document.getElementById('lobby-player-count');
+        const grid = document.getElementById('lobby-roster-grid');
+        if (countEl) countEl.textContent = players.length;
+        if (!grid) return;
+
+        if (players.length === 0) {
+          grid.innerHTML = `<p class="text-sm text-pink-400 italic">No guests added yet — add players above or click Start Trivia Game to jump right in!</p>`;
+          return;
+        }
+
+        grid.innerHTML = players.map(p => `
+          <div class="bg-white border-2 border-pink-300 rounded-2xl px-4 py-2 shadow-md flex items-center gap-2">
+            <span class="text-2xl">${p.avatar}</span>
+            <span class="font-display font-bold text-pink-800 text-base">${escapeHtml(p.name)}</span>
+            <button type="button" data-remove-player="${p.id}" class="remove-player-btn text-pink-300 hover:text-rose-600 font-bold text-base ml-1 cursor-pointer">&times;</button>
+          </div>
+        `).join('');
+
+        grid.querySelectorAll('.remove-player-btn').forEach(btn => {
+          btn.addEventListener('click', () => removePlayerById(btn.getAttribute('data-remove-player')));
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         7. OPTIONAL BACKGROUND PEERJS (NEVER BLOCKS OR CRASHES HOSTING)
+      ---------------------------------------------------------------------- */
+      function loadPeerJsAsync(callback) {
+        if (typeof window.Peer !== 'undefined') {
+          callback(true);
+          return;
+        }
+        const existing = document.getElementById('peerjs-async-script');
+        if (existing) {
+          existing.addEventListener('load', () => callback(typeof window.Peer !== 'undefined'));
+          existing.addEventListener('error', () => callback(false));
+          return;
+        }
+        const script = document.createElement('script');
+        script.id = 'peerjs-async-script';
+        script.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+        script.async = true;
+        script.onload = () => callback(typeof window.Peer !== 'undefined');
+        script.onerror = () => callback(false);
+        document.head.appendChild(script);
+      }
+
+      function initBackgroundPeerHost(pin) {
+        const dot = document.getElementById('lobby-net-dot');
+        const status = document.getElementById('lobby-net-status');
+
+        loadPeerJsAsync((loaded) => {
+          if (!loaded) {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+            if (status) status.textContent = 'Local Party Mode Ready';
+            return;
+          }
+          try {
+            if (peerInstance) {
+              try { peerInstance.destroy(); } catch (e) {}
+            }
+            peerInstance = new window.Peer(`hp-trivia-room-${pin}`, { debug: 0 });
+            peerInstance.on('open', () => {
+              if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+              if (status) status.textContent = `Live Multi-Phone Ready • PIN ${pin}`;
+            });
+            peerInstance.on('connection', (conn) => {
+              conn.on('open', () => {
+                peerConnections[conn.peer] = conn;
+              });
+              conn.on('data', (msg) => {
+                if (!msg || !msg.type) return;
+                if (msg.type === 'JOIN') {
+                  const cleanName = String(msg.name || 'Guest').trim().slice(0, 18) || 'Guest';
+                  let existing = players.find(p => p.id === conn.peer);
+                  if (!existing) {
+                    existing = {
+                      id: conn.peer,
+                      name: cleanName,
+                      avatar: msg.avatar || '🎀',
+                      score: 0,
+                      prevRank: 0,
+                      streak: 0,
+                      answerIdx: null,
+                      answerTimeMs: 0,
+                      lastDelta: 0,
+                      isRemote: true
+                    };
+                    players.push(existing);
+                    sfx('pop');
+                    showToast(`${existing.avatar} ${existing.name} joined from phone!`);
+                    renderLobbyRoster();
+                  }
+                  conn.send({ type: 'WELCOME', title: quizTitle });
+                } else if (msg.type === 'ANSWER') {
+                  const p = players.find(pl => pl.id === conn.peer);
+                  if (p && !isRevealed && p.answerIdx === null) {
+                    p.answerIdx = Number(msg.optionIdx);
+                    p.answerTimeMs = Math.max(100, Date.now() - questionStartMs);
+                    sfx('pop');
+                    updateVotesDisplay();
+                    if (players.every(pl => pl.answerIdx !== null)) {
+                      clearInterval(questionTimer);
+                      setTimeout(revealAnswer, 350);
+                    }
+                  }
+                }
+              });
+            });
+            peerInstance.on('error', () => {
+              if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+              if (status) status.textContent = 'Local Party Mode Ready';
+            });
+          } catch (err) {
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+            if (status) status.textContent = 'Local Party Mode Ready';
+          }
+        });
+      }
+
+      function broadcastToPeers(payload) {
+        Object.values(peerConnections).forEach(conn => {
+          if (conn && conn.open) {
+            try { conn.send(payload); } catch (err) {}
+          }
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         8. LIVE GAMEPLAY LOOP (START -> QUESTION -> REVEAL -> LEADERBOARD -> PODIUM)
+      ---------------------------------------------------------------------- */
+      function startTriviaGame() {
+        if (questions.length === 0) {
+          showToast('Add at least 1 question first!', true);
+          return;
+        }
+
+        // Auto-add Player 1 if lobby has 0 players so you never get stuck!
+        if (players.length === 0) {
+          players.push({
+            id: 'local_player_1',
+            name: 'Player 1',
+            avatar: '👑',
+            score: 0,
+            prevRank: 0,
+            streak: 0,
+            answerIdx: null,
+            answerTimeMs: 0,
+            lastDelta: 0,
+            isRemote: false
+          });
+          showToast('👑 Auto-added "Player 1" so you can play right away!');
+        }
+
+        players.forEach(p => {
+          p.score = 0;
+          p.prevRank = 0;
+          p.streak = 0;
+          p.answerIdx = null;
+          p.lastDelta = 0;
+        });
+
+        currentQuestionIdx = 0;
+        recordHistorySession('In Progress');
+        showView('view-game');
+        beginQuestionRound();
+      }
+
+      function beginQuestionRound() {
+        isRevealed = false;
+        const q = questions[currentQuestionIdx];
+        secondsLeft = q.timeLimit || 20;
+        questionStartMs = Date.now();
+
+        players.forEach(p => {
+          p.answerIdx = null;
+          p.answerTimeMs = 0;
+          p.lastDelta = 0;
+        });
+
+        // Default pass-and-play active player to first un-answered local player
+        const localList = players.filter(p => !p.isRemote);
+        activePassPlayPlayerId = localList.length > 0 ? localList[0].id : null;
+
+        document.getElementById('game-stage-question').classList.remove('hidden');
+        document.getElementById('game-stage-reveal').classList.add('hidden');
+        document.getElementById('game-stage-leaderboard').classList.add('hidden');
+
+        document.getElementById('game-q-progress').textContent = `Question ${currentQuestionIdx + 1} of ${questions.length}`;
+        document.getElementById('game-double-tag').classList.toggle('hidden', !q.doublePoints);
+        document.getElementById('game-question-text').textContent = q.question;
+        document.getElementById('game-timer-badge').textContent = secondsLeft;
+
+        const bar = document.getElementById('game-timer-bar');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bar.style.transition = `width ${secondsLeft}s linear`;
+            bar.style.width = '0%';
+          });
+        });
+
+        // Render 4 glossy Kahoot tiles
+        const grid = document.getElementById('game-options-grid');
+        grid.innerHTML = q.options.map((opt, idx) => `
+          <button type="button" data-tile-idx="${idx}"
+            class="game-answer-tile btn-glossy ${SHAPES[idx].tileClass} rounded-3xl p-5 sm:p-6 text-white text-left flex items-center gap-4 shadow-lg">
+            <span class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
+              ${SHAPES[idx].symbol}
+            </span>
+            <span class="font-display font-bold text-lg sm:text-2xl leading-snug">
+              ${escapeHtml(opt)}
+            </span>
+          </button>
+        `).join('');
+
+        grid.querySelectorAll('.game-answer-tile').forEach(btn => {
+          btn.addEventListener('click', () => handleHostAnswerTileClick(Number(btn.getAttribute('data-tile-idx'))));
+        });
+
+        renderPassPlayChips();
+        updateVotesDisplay();
+        sfx('pop');
+
+        broadcastToPeers({
+          type: 'QUESTION',
+          question: q.question,
+          options: q.options
+        });
+
+        clearInterval(questionTimer);
+        questionTimer = setInterval(() => {
+          secondsLeft--;
+          document.getElementById('game-timer-badge').textContent = Math.max(0, secondsLeft);
+          if (secondsLeft <= 5 && secondsLeft > 0) sfx('urgent');
+          else if (secondsLeft > 5) sfx('tick');
+
+          if (secondsLeft <= 0) {
+            clearInterval(questionTimer);
+            revealAnswer();
+          }
+        }, 1000);
+      }
+
+      function renderPassPlayChips() {
+        const localPlayers = players.filter(p => !p.isRemote);
+        const bar = document.getElementById('pass-play-bar');
+        const chips = document.getElementById('pass-play-chips');
+        if (!bar || !chips) return;
+
+        if (localPlayers.length <= 1) {
+          bar.classList.add('hidden');
+          return;
+        }
+
+        bar.classList.remove('hidden');
+        chips.innerHTML = localPlayers.map(p => {
+          const isSelected = p.id === activePassPlayPlayerId;
+          const hasVoted = p.answerIdx !== null;
+          return `
+            <button type="button" data-select-pp="${p.id}"
+              class="pp-chip-btn px-3 py-1 rounded-full text-xs font-bold border transition cursor-pointer flex items-center gap-1 ${
+                isSelected
+                  ? 'bg-pink-600 text-white border-pink-700 shadow scale-105'
+                  : hasVoted
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : 'bg-white text-pink-800 border-pink-300 hover:bg-pink-100'
+              }">
+              <span>${p.avatar}</span>
+              <span>${escapeHtml(p.name)}</span>
+              <span>${hasVoted ? '✓' : ''}</span>
+            </button>
+          `;
+        }).join('');
+
+        chips.querySelectorAll('.pp-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            activePassPlayPlayerId = btn.getAttribute('data-select-pp');
+            renderPassPlayChips();
+          });
+        });
+      }
+
+      function handleHostAnswerTileClick(optionIdx) {
+        if (isRevealed) return;
+        const localPlayers = players.filter(p => !p.isRemote);
+        if (localPlayers.length === 0) return;
+
+        // If 1 local player, record their answer and reveal immediately
+        if (players.length === 1 && localPlayers.length === 1) {
+          localPlayers[0].answerIdx = optionIdx;
+          localPlayers[0].answerTimeMs = Math.max(150, Date.now() - questionStartMs);
+          sfx('pop');
+          updateVotesDisplay();
+          clearInterval(questionTimer);
+          revealAnswer();
+          return;
+        }
+
+        // Multi-player pass-and-play: lock in for the selected local player and advance to next
+        const target = localPlayers.find(p => p.id === activePassPlayPlayerId) || localPlayers.find(p => p.answerIdx === null);
+        if (target) {
+          target.answerIdx = optionIdx;
+          target.answerTimeMs = Math.max(150, Date.now() - questionStartMs);
+          sfx('pop');
+          const nextUnvoted = localPlayers.find(p => p.answerIdx === null);
+          activePassPlayPlayerId = nextUnvoted ? nextUnvoted.id : null;
+          renderPassPlayChips();
+          updateVotesDisplay();
+
+          if (players.every(p => p.answerIdx !== null)) {
+            clearInterval(questionTimer);
+            setTimeout(revealAnswer, 350);
+          }
+        }
+      }
+
+      function updateVotesDisplay() {
+        const voted = players.filter(p => p.answerIdx !== null).length;
+        document.getElementById('game-votes-counter').textContent = `${voted} / ${players.length}`;
+      }
+
+      function revealAnswer() {
+        if (isRevealed) return;
+        isRevealed = true;
+        clearInterval(questionTimer);
+
+        const q = questions[currentQuestionIdx];
+        const totalMs = (q.timeLimit || 20) * 1000;
+        const mult = q.doublePoints ? 2 : 1;
+
+        const beforeSorted = getSortedPlayers();
+        beforeSorted.forEach((p, idx) => { p.prevRank = idx + 1; });
+
+        const counts = [0, 0, 0, 0];
+        players.forEach(p => {
+          if (p.answerIdx !== null && p.answerIdx >= 0 && p.answerIdx <= 3) {
+            counts[p.answerIdx]++;
+          }
+          if (p.answerIdx === q.correctIndex) {
+            const elapsed = Math.min(totalMs, p.answerTimeMs || totalMs / 2);
+            const speedBonus = 1 - (elapsed / totalMs) * 0.45;
+            const pts = Math.round(1000 * speedBonus * mult);
+            p.score += pts;
+            p.lastDelta = pts;
+            p.streak += 1;
+          } else {
+            p.lastDelta = 0;
+            p.streak = 0;
+          }
+        });
+
+        const ranked = getSortedPlayers();
+        ranked.forEach((p, idx) => {
+          const conn = peerConnections[p.id];
+          if (conn && conn.open) {
+            try {
+              conn.send({
+                type: 'RESULT',
+                correct: p.answerIdx === q.correctIndex,
+                delta: p.lastDelta,
+                totalScore: p.score,
+                streak: p.streak,
+                rank: idx + 1
+              });
+            } catch (err) {}
+          }
+        });
+
+        sfx('correct');
+        if (q.doublePoints) launchConfetti();
+
+        document.getElementById('reveal-q-title').textContent = q.question;
+        const maxVotes = Math.max(1, ...counts);
+
+        document.getElementById('reveal-chart-bars').innerHTML = [0, 1, 2, 3].map(idx => {
+          const isRight = idx === q.correctIndex;
+          const pct = Math.max(14, Math.round((counts[idx] / maxVotes) * 100));
+          return `
+            <div class="flex flex-col items-center justify-end h-full">
+              <div class="font-display font-bold text-base sm:text-xl mb-1 ${isRight ? 'text-pink-700' : 'text-gray-400'}">
+                ${counts[idx]} ${isRight ? '✓' : ''}
+              </div>
+              <div style="height: ${pct}%; background: ${SHAPES[idx].barColor};"
+                class="w-full max-w-[76px] rounded-t-2xl flex items-end justify-center pb-2 text-white font-bold text-lg shadow ${isRight ? 'opacity-100 ring-4 ring-pink-300' : 'opacity-40'}">
+                ${SHAPES[idx].symbol}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('reveal-answer-cards').innerHTML = q.options.map((opt, idx) => {
+          const isRight = idx === q.correctIndex;
+          return `
+            <div class="${SHAPES[idx].tileClass} ${isRight ? 'ring-4 ring-emerald-300' : 'opacity-45'} rounded-2xl p-4 text-white flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-xl font-bold">${SHAPES[idx].symbol}</span>
+                <span class="font-display font-bold text-base sm:text-lg">${escapeHtml(opt)}</span>
+              </div>
+              <span class="text-xl font-bold">${isRight ? '✅' : ''}</span>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('game-stage-question').classList.add('hidden');
+        document.getElementById('game-stage-reveal').classList.remove('hidden');
+        recordHistorySession('In Progress');
+      }
+
+      function getSortedPlayers() {
+        return [...players].sort((a, b) => b.score - a.score);
+      }
+
+      function showRoundLeaderboard() {
+        if (currentQuestionIdx >= questions.length - 1) {
+          showFinalPodium();
+          return;
+        }
+
+        const ranked = getSortedPlayers();
+        document.getElementById('btn-next-round').textContent =
+          currentQuestionIdx === questions.length - 2 ? 'Final Question! 🎀 →' : 'Next Question →';
+
+        document.getElementById('round-leaderboard-list').innerHTML = ranked.map((p, idx) => {
+          const rank = idx + 1;
+          return `
+            <div class="flex items-center justify-between px-4 py-3 rounded-2xl ${rank === 1 ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg' : 'bg-pink-50 border border-pink-200 text-pink-950'}">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full font-display font-bold flex items-center justify-center ${rank === 1 ? 'bg-white text-pink-600' : 'bg-pink-200 text-pink-800'}">
+                  ${rank}
+                </span>
+                <span class="text-2xl">${p.avatar}</span>
+                <span class="font-display font-bold text-base sm:text-lg">${escapeHtml(p.name)}</span>
+                ${p.streak >= 2 ? `<span class="text-xs bg-amber-400 text-pink-950 px-2 py-0.5 rounded-full font-extrabold">🔥 ${p.streak}</span>` : ''}
+              </div>
+              <div class="text-right">
+                <div class="font-display font-bold text-lg sm:text-xl">${p.score.toLocaleString()}</div>
+                ${p.lastDelta > 0 ? `<div class="text-xs font-bold ${rank === 1 ? 'text-pink-100' : 'text-emerald-600'}">+${p.lastDelta}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('game-stage-reveal').classList.add('hidden');
+        document.getElementById('game-stage-leaderboard').classList.remove('hidden');
+      }
+
+      function advanceNextQuestion() {
+        currentQuestionIdx++;
+        if (currentQuestionIdx < questions.length) {
+          beginQuestionRound();
+        } else {
+          showFinalPodium();
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         9. ANIMATED KAHOOT-STYLE PODIUM FINALE
+      ---------------------------------------------------------------------- */
+      function showFinalPodium() {
+        recordHistorySession('Completed');
+        const ranked = getSortedPlayers();
+        broadcastToPeers({
+          type: 'PODIUM',
+          standings: ranked.map((p, i) => ({ id: p.id, rank: i + 1, score: p.score }))
+        });
+        showView('view-podium');
+        runPodiumSequence(ranked);
+      }
+
+      function runPodiumSequence(ranked) {
+        podiumTimers.forEach(t => clearTimeout(t));
+        podiumTimers = [];
+
+        const stage = document.getElementById('podium-pedestals');
+        const statusEl = document.getElementById('podium-status-text');
+        const headlineEl = document.getElementById('podium-headline');
+        const fullTableEl = document.getElementById('podium-full-table');
+
+        headlineEl.textContent = 'And the Winners Are... 👑';
+        statusEl.textContent = '🥁 Drumroll please...';
+        fullTableEl.classList.add('opacity-0');
+
+        const slots = [
+          { id: 'pod-2', player: ranked[1], rank: 2, height: 'h-32 sm:h-44', bg: 'from-pink-300 via-rose-400 to-pink-500', medal: '🥈', label: '2ND PLACE' },
+          { id: 'pod-1', player: ranked[0], rank: 1, height: 'h-48 sm:h-60', bg: 'from-amber-300 via-pink-500 to-rose-600', medal: '👑', label: '1ST PLACE' },
+          { id: 'pod-3', player: ranked[2], rank: 3, height: 'h-24 sm:h-32', bg: 'from-rose-200 via-pink-300 to-rose-400', medal: '🥉', label: '3RD PLACE' }
+        ];
+
+        stage.innerHTML = slots.map(slot => {
+          if (!slot.player) return `<div></div>`;
+          const p = slot.player;
+          return `
+            <div id="${slot.id}" class="opacity-0 flex flex-col items-center justify-end">
+              <div id="${slot.id}-medal" class="text-3xl sm:text-5xl mb-1">${slot.medal}</div>
+              <div class="text-4xl sm:text-5xl mb-1.5 animate-avatar-dance">${p.avatar}</div>
+              <div class="font-display font-bold text-sm sm:text-xl text-pink-900 truncate max-w-full px-1">${escapeHtml(p.name)}</div>
+              <div class="text-xs sm:text-sm font-extrabold text-pink-600 mb-2">${p.score.toLocaleString()} pts</div>
+              <div class="w-full ${slot.height} bg-gradient-to-b ${slot.bg} ${slot.rank === 1 ? 'podium-spotlight-1st ring-4 ring-amber-200' : ''} rounded-t-3xl shadow-xl flex flex-col items-center justify-center text-white border-t-2 border-white/80 px-2">
+                <span class="font-display font-bold text-3xl sm:text-5xl drop-shadow">${slot.rank}</span>
+                <span class="text-[10px] sm:text-xs font-extrabold tracking-widest uppercase mt-1">${slot.label}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        fullTableEl.innerHTML = `
+          <div class="text-xs font-extrabold uppercase tracking-wider text-pink-500 mb-1.5 text-center">Full Final Standings</div>
+          ${ranked.map((p, i) => `
+            <div class="flex items-center justify-between bg-pink-50 border border-pink-200 rounded-xl px-4 py-2 text-sm">
+              <span class="font-bold text-pink-900">#${i + 1} ${p.avatar} ${escapeHtml(p.name)}</span>
+              <span class="font-display font-bold text-pink-600">${p.score.toLocaleString()} pts</span>
+            </div>
+          `).join('')}
+        `;
+
+        sfx('drumroll');
+
+        podiumTimers.push(setTimeout(() => {
+          const el3 = document.getElementById('pod-3');
+          if (el3 && ranked[2]) {
+            el3.classList.remove('opacity-0');
+            el3.classList.add('animate-podium-rise');
+            statusEl.textContent = `🥉 3rd Place goes to ${ranked[2].name}!`;
+            sfx('podiumStep');
+          }
+        }, 1000));
+
+        podiumTimers.push(setTimeout(() => {
+          const el2 = document.getElementById('pod-2');
+          if (el2 && ranked[1]) {
+            el2.classList.remove('opacity-0');
+            el2.classList.add('animate-podium-rise');
+            statusEl.textContent = `🥈 2nd Place goes to ${ranked[1].name}!`;
+            sfx('podiumStep');
+          }
+        }, 2200));
+
+        podiumTimers.push(setTimeout(() => {
+          if (ranked[0]) {
+            statusEl.textContent = '🥁 And in 1st Place...';
+            sfx('drumroll');
+          }
+        }, 3300));
+
+        podiumTimers.push(setTimeout(() => {
+          const el1 = document.getElementById('pod-1');
+          const medal1 = document.getElementById('pod-1-medal');
+          if (el1 && ranked[0]) {
+            el1.classList.remove('opacity-0');
+            el1.classList.add('animate-podium-rise');
+            if (medal1) medal1.classList.add('animate-crown-drop');
+            headlineEl.textContent = `${ranked[0].name} Takes 1st Place! 👑`;
+            statusEl.textContent = `🎉 Congrats ${ranked[0].name} — ${ranked[0].score.toLocaleString()} pts!`;
+          }
+          fullTableEl.classList.remove('opacity-0');
+          sfx('fanfare');
+          launchConfetti();
+          podiumTimers.push(setTimeout(launchConfetti, 650));
+        }, 4300));
+      }
+
+      /* ----------------------------------------------------------------------
+         10. CUSTOM QUIZ & BULK PASTE EDITOR
+      ---------------------------------------------------------------------- */
+      function openQuizEditor() {
+        syncTitleDisplays();
+        renderSavedDecks();
+        renderEditorQuestions();
+        showView('view-editor');
+      }
+
+      function renderSavedDecks() {
+        const bar = document.getElementById('saved-decks-container');
+        const chips = document.getElementById('saved-decks-chips');
+        if (!bar || !chips) return;
+        if (savedDecks.length === 0) {
+          bar.classList.add('hidden');
+          return;
+        }
+        bar.classList.remove('hidden');
+        chips.innerHTML = savedDecks.map(deck => `
+          <div class="inline-flex items-center bg-fuchsia-100 border border-fuchsia-200 rounded-xl overflow-hidden">
+            <button type="button" data-load-deck="${deck.id}" class="load-deck-btn px-3 py-1 text-xs font-bold text-fuchsia-900 hover:bg-fuchsia-200 cursor-pointer">
+              ⭐ ${escapeHtml(deck.name)} (${deck.questions.length} Qs)
+            </button>
+            <button type="button" data-del-deck="${deck.id}" class="del-deck-btn px-2 py-1 text-xs font-bold text-fuchsia-500 hover:text-rose-600 cursor-pointer">&times;</button>
+          </div>
+        `).join('');
+
+        chips.querySelectorAll('.load-deck-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const deck = savedDecks.find(d => d.id === btn.getAttribute('data-load-deck'));
+            if (!deck) return;
+            quizTitle = deck.title;
+            quizTagline = deck.tagline;
+            questions = JSON.parse(JSON.stringify(deck.questions));
+            persistState();
+            syncTitleDisplays();
+            renderEditorQuestions();
+            showToast(`⭐ Loaded "${deck.name}"!`);
+          });
+        });
+
+        chips.querySelectorAll('.del-deck-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-del-deck');
+            savedDecks = savedDecks.filter(d => d.id !== id);
+            persistState();
+            renderSavedDecks();
+          });
+        });
+      }
+
+      function renderEditorQuestions() {
+        const container = document.getElementById('editor-questions-container');
+        if (!container) return;
+
+        container.innerHTML = questions.map((q, qIdx) => `
+          <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="bg-pink-500 text-white font-display font-bold text-xs px-3 py-1 rounded-full">Q${qIdx + 1}</span>
+                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full cursor-pointer">
+                  <input type="checkbox" data-q-double="${qIdx}" ${q.doublePoints ? 'checked' : ''} class="ed-double-chk accent-pink-600" />
+                  ✨ 2X Points
+                </label>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <select data-q-time="${qIdx}" class="ed-time-sel bg-white border border-pink-200 rounded-lg px-2 py-1 text-xs font-bold text-pink-700">
+                  ${[10, 15, 20, 30].map(s => `<option value="${s}" ${q.timeLimit === s ? 'selected' : ''}>⏱ ${s}s</option>`).join('')}
+                </select>
+                <button type="button" data-q-del="${qIdx}" class="ed-del-btn bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer">🗑</button>
+              </div>
+            </div>
+
+            <input type="text" data-q-text="${qIdx}" value="${escapeHtml(q.question)}"
+              class="ed-q-input w-full bg-white border border-pink-300 focus:border-pink-500 focus:outline-none rounded-xl px-3.5 py-2 font-semibold text-sm text-pink-950" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${q.options.map((opt, optIdx) => `
+                <div class="flex items-center gap-2 bg-white border ${q.correctIndex === optIdx ? 'border-emerald-400 ring-2 ring-emerald-200' : 'border-pink-200'} rounded-xl px-2.5 py-1.5">
+                  <button type="button" data-q-correct="${qIdx}:${optIdx}"
+                    class="ed-correct-btn w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer ${q.correctIndex === optIdx ? 'bg-emerald-500 text-white' : 'bg-pink-100 text-pink-600'}">
+                    ${q.correctIndex === optIdx ? '✓' : SHAPES[optIdx].symbol}
+                  </button>
+                  <input type="text" data-q-opt="${qIdx}:${optIdx}" value="${escapeHtml(opt)}"
+                    class="ed-opt-input w-full text-xs sm:text-sm font-medium text-gray-800 focus:outline-none" />
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.ed-q-input').forEach(inp => {
+          inp.addEventListener('input', () => {
+            questions[Number(inp.getAttribute('data-q-text'))].question = inp.value;
+            persistState();
+          });
+        });
+
+        container.querySelectorAll('.ed-opt-input').forEach(inp => {
+          inp.addEventListener('input', () => {
+            const [qi, oi] = inp.getAttribute('data-q-opt').split(':').map(Number);
+            questions[qi].options[oi] = inp.value;
+            persistState();
+          });
+        });
+
+        container.querySelectorAll('.ed-correct-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const [qi, oi] = btn.getAttribute('data-q-correct').split(':').map(Number);
+            questions[qi].correctIndex = oi;
+            persistState();
+            renderEditorQuestions();
+          });
+        });
+
+        container.querySelectorAll('.ed-double-chk').forEach(chk => {
+          chk.addEventListener('change', () => {
+            questions[Number(chk.getAttribute('data-q-double'))].doublePoints = chk.checked;
+            persistState();
+          });
+        });
+
+        container.querySelectorAll('.ed-time-sel').forEach(sel => {
+          sel.addEventListener('change', () => {
+            questions[Number(sel.getAttribute('data-q-time'))].timeLimit = Number(sel.value);
+            persistState();
+          });
+        });
+
+        container.querySelectorAll('.ed-del-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (questions.length <= 1) {
+              showToast('Keep at least 1 question!', true);
+              return;
+            }
+            questions.splice(Number(btn.getAttribute('data-q-del')), 1);
+            persistState();
+            syncTitleDisplays();
+            renderEditorQuestions();
+          });
+        });
+      }
+
+      function processBulkPaste(replaceExisting) {
+        const raw = document.getElementById('textarea-bulk-paste').value.trim();
+        if (!raw) {
+          showToast('Paste your questions first!', true);
+          return;
+        }
+        const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+        const parsedList = [];
+
+        lines.forEach(line => {
+          const parts = line.split('|').map(p => p.trim()).filter(Boolean);
+          if (parts.length < 3) return;
+          let qText = parts[0];
+          const is2x = /^\[2x\]/i.test(qText);
+          if (is2x) qText = qText.replace(/^\[2x\]/i, '').trim();
+
+          const opts = parts.slice(1, 5);
+          while (opts.length < 4) opts.push('—');
+          let correctIdx = 0;
+          const cleanOpts = opts.map((o, idx) => {
+            if (o.includes('*')) {
+              correctIdx = idx;
+              return o.replace(/\*/g, '').trim();
+            }
+            return o;
+          });
+
+          parsedList.push({
+            question: qText,
+            options: cleanOpts,
+            correctIndex: correctIdx,
+            timeLimit: 20,
+            doublePoints: is2x
+          });
+        });
+
+        if (parsedList.length === 0) {
+          showToast('Use format: Question? | Correct* | Option B | Option C | Option D', true);
+          return;
+        }
+
+        questions = replaceExisting ? parsedList : [...questions, ...parsedList];
+        persistState();
+        syncTitleDisplays();
+        renderEditorQuestions();
+        closeModal('modal-bulk');
+        showToast(`🎀 Imported ${parsedList.length} questions!`);
+      }
+
+      /* ----------------------------------------------------------------------
+         11. GAME HISTORY & HALL OF FAME
+      ---------------------------------------------------------------------- */
+      function recordHistorySession(status) {
+        const sorted = getSortedPlayers();
+        const winner = sorted[0];
+        const nowStr = new Date().toLocaleString(undefined, {
+          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+        });
+
+        if (!currentHistoryId) {
+          currentHistoryId = 'hist_' + Date.now();
+          gameHistory.unshift({
+            id: currentHistoryId,
+            title: quizTitle,
+            date: nowStr,
+            pin: roomPin || '----',
+            status,
+            playerCount: sorted.length,
+            winnerName: winner ? `${winner.avatar} ${winner.name}` : '—',
+            topScore: winner ? winner.score : 0
+          });
+        } else {
+          const item = gameHistory.find(h => h.id === currentHistoryId);
+          if (item) {
+            item.title = quizTitle;
+            item.status = status;
+            item.playerCount = sorted.length;
+            item.winnerName = winner ? `${winner.avatar} ${winner.name}` : '—';
+            item.topScore = winner ? winner.score : 0;
+          }
+        }
+        persistState();
+        syncTitleDisplays();
+      }
+
+      function renderHistoryModal() {
+        document.getElementById('stat-total-games').textContent = gameHistory.length;
+        const topEver = gameHistory.reduce((max, g) => Math.max(max, g.topScore || 0), 0);
+        const totalGuests = gameHistory.reduce((sum, g) => sum + (g.playerCount || 0), 0);
+        document.getElementById('stat-top-score').textContent = topEver.toLocaleString();
+        document.getElementById('stat-total-players').textContent = totalGuests;
+
+        const container = document.getElementById('history-list-container');
+        if (gameHistory.length === 0) {
+          container.innerHTML = `
+            <div class="bg-pink-50 border-2 border-dashed border-pink-200 rounded-2xl p-8 text-center">
+              <div class="text-4xl mb-2">🎀</div>
+              <p class="font-display font-bold text-pink-700 text-lg">No games recorded yet!</p>
+              <p class="text-xs text-gray-500 mt-1">Open a Party Lobby and your game logs will appear right here.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = gameHistory.map(g => `
+          <div class="bg-pink-50 border border-pink-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="font-display font-bold text-pink-800 text-base">${escapeHtml(g.title)}</div>
+              <div class="text-xs text-pink-500 font-semibold">
+                🗓 ${escapeHtml(g.date)} • PIN ${escapeHtml(g.pin)} • ${g.playerCount} Player(s) • ${escapeHtml(g.status)}
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-extrabold text-pink-700">👑 ${escapeHtml(g.winnerName)}</div>
+              <div class="font-display font-bold text-sm text-rose-600">${(g.topScore || 0).toLocaleString()} pts</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      /* ----------------------------------------------------------------------
+         12. GUEST PHONE JOIN & BUZZER CONTROLLER
+      ---------------------------------------------------------------------- */
+      function openJoinScreen() {
+        sfx('pop');
+        renderAvatarGrids();
+        showView('view-join');
+      }
+
+      function submitGuestJoin() {
+        const pin = document.getElementById('input-join-pin').value.replace(/\D/g, '').slice(0, 4);
+        const name = document.getElementById('input-join-name').value.trim();
+        if (pin.length !== 4) {
+          showToast('Enter the 4-digit Room PIN from the host screen!', true);
+          return;
+        }
+        if (!name) {
+          showToast('Enter your nickname first!', true);
+          return;
+        }
+
+        const btn = document.getElementById('btn-submit-join');
+        btn.disabled = true;
+        btn.textContent = 'Connecting... 🎀';
+
+        loadPeerJsAsync((loaded) => {
+          if (!loaded) {
+            btn.disabled = false;
+            btn.textContent = '✨ Enter Party Room';
+            showToast('Live phone connection blocked by network; use "Add Player on This Screen" in the Host Lobby!', true);
+            return;
+          }
+
+          try {
+            if (peerInstance) {
+              try { peerInstance.destroy(); } catch (e) {}
+            }
+            peerInstance = new window.Peer({ debug: 0 });
+            peerInstance.on('open', () => {
+              guestConnection = peerInstance.connect(`hp-trivia-room-${pin}`, { reliable: true });
+              const timer = setTimeout(() => {
+                if (!guestConnection || !guestConnection.open) {
+                  btn.disabled = false;
+                  btn.textContent = '✨ Enter Party Room';
+                  showToast(`Room ${pin} not found — check the PIN on the TV!`, true);
+                }
+              }, 6000);
+
+              guestConnection.on('open', () => {
+                clearTimeout(timer);
+                btn.disabled = false;
+                btn.textContent = '✨ Enter Party Room';
+                guestProfile = { id: peerInstance.id, name, avatar: selectedJoinAvatar, score: 0, streak: 0, locked: false };
+                guestConnection.send({ type: 'JOIN', name, avatar: selectedJoinAvatar });
+
+                document.getElementById('guest-hud-avatar').textContent = selectedJoinAvatar;
+                document.getElementById('guest-hud-name').textContent = name;
+                document.getElementById('guest-hud-pin').textContent = pin;
+                showView('view-guest-play');
+                showGuestSubState('guest-state-waiting');
+              });
+
+              guestConnection.on('data', (msg) => {
+                if (!msg || !msg.type) return;
+                if (msg.type === 'WELCOME' || msg.type === 'SYNC_TITLE') {
+                  if (msg.title) {
+                    document.getElementById('guest-hud-quiz-title').textContent = msg.title;
+                    document.getElementById('guest-waiting-quiz-title').textContent = msg.title;
+                  }
+                } else if (msg.type === 'QUESTION') {
+                  guestProfile.locked = false;
+                  document.getElementById('guest-question-prompt').textContent = msg.question;
+                  (msg.options || []).forEach((opt, i) => {
+                    const el = document.getElementById(`guest-opt-${i}`);
+                    if (el) el.textContent = opt;
+                  });
+                  showGuestSubState('guest-state-buzzers');
+                } else if (msg.type === 'RESULT') {
+                  guestProfile.score = msg.totalScore || 0;
+                  document.getElementById('guest-hud-score').textContent = `${guestProfile.score.toLocaleString()} pts`;
+                  document.getElementById('guest-status-icon').textContent = msg.correct ? '💖' : '💔';
+                  document.getElementById('guest-status-title').textContent = msg.correct ? 'Correct!' : 'Not Quite!';
+                  document.getElementById('guest-status-pill').textContent = `+${msg.delta || 0} pts`;
+                  document.getElementById('guest-status-sub').textContent = `You're #${msg.rank} on the board!`;
+                  showGuestSubState('guest-state-status');
+                  if (msg.correct) launchConfetti();
+                } else if (msg.type === 'PODIUM') {
+                  const me = (msg.standings || []).find(s => s.id === guestProfile.id);
+                  const r = me ? me.rank : '?';
+                  document.getElementById('guest-status-icon').textContent = r === 1 ? '👑' : r <= 3 ? '🏆' : '🎀';
+                  document.getElementById('guest-status-title').textContent = r === 1 ? '1st Place Champion!' : `Finished #${r}!`;
+                  document.getElementById('guest-status-pill').textContent = `${guestProfile.score.toLocaleString()} Total Pts`;
+                  document.getElementById('guest-status-sub').textContent = 'Check out the podium on the big screen!';
+                  showGuestSubState('guest-state-status');
+                }
+              });
+            });
+          } catch (err) {
+            btn.disabled = false;
+            btn.textContent = '✨ Enter Party Room';
+            showToast('Could not connect from this browser.', true);
+          }
+        });
+      }
+
+      function showGuestSubState(id) {
+        ['guest-state-waiting', 'guest-state-buzzers', 'guest-state-status'].forEach(sid => {
+          document.getElementById(sid).classList.toggle('hidden', sid !== id);
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         13. WIRE ALL DOM EVENT LISTENERS CLEANLY ON INIT
+      ---------------------------------------------------------------------- */
+      function initApp() {
+        const on = (id, event, fn) => {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener(event, fn);
+        };
+
+        // Top Header Controls
+        on('btn-header-edit-title', 'click', () => {
+          document.getElementById('modal-input-title').value = quizTitle;
+          document.getElementById('modal-input-tagline').value = quizTagline;
+          openModal('modal-title');
+        });
+        on('btn-lobby-edit-title', 'click', () => {
+          document.getElementById('modal-input-title').value = quizTitle;
+          document.getElementById('modal-input-tagline').value = quizTagline;
+          openModal('modal-title');
+        });
+        on('btn-save-modal-title', 'click', () => {
+          const t = document.getElementById('modal-input-title').value.trim();
+          const g = document.getElementById('modal-input-tagline').value.trim();
+          if (t) quizTitle = t;
+          if (g) quizTagline = g;
+          persistState();
+          syncTitleDisplays();
+          closeModal('modal-title');
+          sfx('pop');
+          showToast('🎀 Quiz title updated!');
+        });
+
+        on('btn-nav-editor', 'click', openQuizEditor);
+        on('btn-nav-history', 'click', () => {
+          renderHistoryModal();
+          openModal('modal-history');
+        });
+        on('btn-nav-music', 'click', () => {
+          musicMuted = !musicMuted;
+          document.getElementById('music-icon').textContent = musicMuted ? '🔇' : '🔊';
+          document.getElementById('music-label').textContent = musicMuted ? 'Muted' : 'Music';
+          if (!musicMuted) sfx('pop');
+        });
+        on('btn-nav-home', 'click', () => {
+          clearInterval(questionTimer);
+          podiumTimers.forEach(t => clearTimeout(t));
+          showView('view-portal');
+        });
+
+        // Start Portal Cards & Quick Launch
+        on('card-host-party', 'click', openHostSetup);
+        on('card-join-party', 'click', openJoinScreen);
+        on('btn-quick-launch', 'click', launchLobby);
+
+        document.querySelectorAll('.preset-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            applyPreset(chip.getAttribute('data-preset'));
+          });
+        });
+
+        // Host Setup Screen
+        on('btn-setup-back', 'click', () => showView('view-portal'));
+        on('input-setup-title', 'input', (e) => {
+          if (e.target.value.trim()) {
+            quizTitle = e.target.value.trim();
+            persistState();
+            syncTitleDisplays();
+          }
+        });
+        on('input-setup-tagline', 'input', (e) => {
+          if (e.target.value.trim()) {
+            quizTagline = e.target.value.trim();
+            persistState();
+            syncTitleDisplays();
+          }
+        });
+        on('select-setup-preset', 'change', (e) => {
+          if (e.target.value !== 'current') {
+            applyPreset(e.target.value);
+          }
+        });
+        on('btn-setup-open-editor', 'click', openQuizEditor);
+        on('btn-launch-lobby', 'click', launchLobby);
+
+        // Host Lobby Screen
+        on('btn-lobby-edit-quiz', 'click', openQuizEditor);
+        on('btn-copy-join-link', 'click', () => {
+          const url = document.getElementById('lobby-join-url').textContent;
+          copyTextSafe(url);
+          sfx('pop');
+          showToast(`📋 Copied join link for PIN ${roomPin}!`);
+        });
+        on('btn-add-local-player', 'click', addLocalGuest);
+        on('input-local-player-name', 'keydown', (e) => {
+          if (e.key === 'Enter') addLocalGuest();
+        });
+        on('btn-start-trivia', 'click', startTriviaGame);
+
+        // Question Editor Screen
+        on('input-editor-title', 'input', (e) => {
+          if (e.target.value.trim()) {
+            quizTitle = e.target.value.trim();
+            persistState();
+            syncTitleDisplays();
+          }
+        });
+        on('input-editor-tagline', 'input', (e) => {
+          if (e.target.value.trim()) {
+            quizTagline = e.target.value.trim();
+            persistState();
+            syncTitleDisplays();
+          }
+        });
+        document.querySelectorAll('.editor-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => applyPreset(btn.getAttribute('data-editor-preset')));
+        });
+        on('btn-add-question', 'click', () => {
+          questions.push({
+            question: 'New custom trivia question?',
+            options: ['Correct Answer', 'Option B', 'Option C', 'Option D'],
+            correctIndex: 0,
+            timeLimit: 20,
+            doublePoints: false
+          });
+          persistState();
+          syncTitleDisplays();
+          renderEditorQuestions();
+        });
+        on('btn-editor-done', 'click', launchLobby);
+
+        // Bulk Paste & Save Deck Modals
+        on('btn-open-bulk-paste', 'click', () => {
+          document.getElementById('textarea-bulk-paste').value = '';
+          openModal('modal-bulk');
+        });
+        on('btn-bulk-append', 'click', () => processBulkPaste(false));
+        on('btn-bulk-replace', 'click', () => processBulkPaste(true));
+
+        on('btn-open-save-deck', 'click', () => {
+          document.getElementById('input-custom-deck-name').value = quizTitle;
+          openModal('modal-save-deck');
+        });
+        on('btn-confirm-save-deck', 'click', () => {
+          const name = document.getElementById('input-custom-deck-name').value.trim();
+          if (!name) {
+            showToast('Enter a deck name!', true);
+            return;
+          }
+          savedDecks.unshift({
+            id: 'deck_' + Date.now(),
+            name,
+            title: quizTitle,
+            tagline: quizTagline,
+            questions: JSON.parse(JSON.stringify(questions))
+          });
+          persistState();
+          renderSavedDecks();
+          closeModal('modal-save-deck');
+          showToast(`⭐ Saved "${name}"!`);
+        });
+
+        // Live Gameplay & Podium Controls
+        on('btn-reveal-now', 'click', revealAnswer);
+        on('btn-to-leaderboard', 'click', showRoundLeaderboard);
+        on('btn-next-round', 'click', advanceNextQuestion);
+        on('btn-replay-podium', 'click', () => {
+          sfx('pop');
+          runPodiumSequence(getSortedPlayers());
+        });
+        on('btn-podium-confetti', 'click', launchConfetti);
+        on('btn-podium-home', 'click', () => showView('view-portal'));
+
+        // Guest Join & Buzzer Controls
+        on('btn-join-back', 'click', () => showView('view-portal'));
+        on('btn-submit-join', 'click', submitGuestJoin);
+        document.querySelectorAll('.guest-buzzer-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (guestProfile.locked || !guestConnection || !guestConnection.open) return;
+            guestProfile.locked = true;
+            sfx('pop');
+            guestConnection.send({ type: 'ANSWER', optionIdx: Number(btn.getAttribute('data-buzzer')) });
+            document.getElementById('guest-status-icon').textContent = '🔒';
+            document.getElementById('guest-status-title').textContent = 'Locked In!';
+            document.getElementById('guest-status-pill').textContent = 'Waiting for reveal...';
+            document.getElementById('guest-status-sub').textContent = 'Fingers crossed!';
+            showGuestSubState('guest-state-status');
+          });
+        });
+
+        // History Modal Clear
+        on('btn-clear-history', 'click', () => {
+          gameHistory = [];
+          currentHistoryId = null;
+          persistState();
+          syncTitleDisplays();
+          renderHistoryModal();
+          showToast('🗑 History cleared!');
+        });
+
+        // Generic Close Buttons for All Modals
+        document.querySelectorAll('[data-close-modal]').forEach(btn => {
+          btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close-modal')));
+        });
+
+        // Initial Sync & URL ?pin= Auto-Open
+        syncTitleDisplays();
+        renderAvatarGrids();
+
+        try {
+          const urlPin = new URLSearchParams(window.location.search).get('pin');
+          if (urlPin && /^\d{4}$/.test(urlPin.trim())) {
+            document.getElementById('input-join-pin').value = urlPin.trim();
+            openJoinScreen();
+          }
+        } catch (err) {}
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>
